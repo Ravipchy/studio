@@ -45,7 +45,7 @@ export function Footer() {
             <li><Link href="/telemedicine" className="hover:underline">Telemedicine</Link></li>
             <li><Link href="/health-record" className="hover:underline">Medical Report</Link></li>
             <li><Link href="/pharmacy" className="hover:underline">Pharmacy</Link></li>
-            <li><Link href="#" className="hover:underline">Home Care</Link></li>
+            <li><Link href="/home-care" className="hover:underline">Home Care</Link></li>
           </ul>
         </div>
         <div className="bg-white text-gray-800 p-4 rounded-lg">

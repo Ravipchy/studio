@@ -18,7 +18,7 @@ const services = [
   {label:"Telemedicine", href:"/telemedicine"},
   {label:"View Medical Report", href:"/health-record"}, 
   {label:"Pharmacy", href:"/pharmacy"}, 
-  {label:"Home Care", href:"#"}, 
+  {label:"Home Care", href:"/home-care"}, 
   {label:"Lab Tests", href:"#"}, 
   {label:"Mental Health", href:"#"}
 ];
