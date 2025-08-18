@@ -6,6 +6,18 @@ import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndP
 import { auth, db } from "@/lib/firebase";
 import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
 import { type User as AppUser } from "@/models/user";
+import { initializeApp } from "firebase/app";
+
+// Re-initializing here to ensure it's available.
+const firebaseConfig = {
+  apiKey: "AIzaSyDCaNgCa9ViyRhAOx54YWrDcCrg2MXMiEE",
+  authDomain: "arogya-sathi-web.firebaseapp.com",
+  projectId: "arogya-sathi-web",
+  storageBucket: "arogya-sathi-web.appspot.com",
+  messagingSenderId: "98089851553",
+  appId: "1:98089851553:web:e960614b8b7159539beee0"
+};
+const app = initializeApp(firebaseConfig);
 
 interface AuthContextType {
   user: User | null;
