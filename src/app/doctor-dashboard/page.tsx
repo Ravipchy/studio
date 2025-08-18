@@ -1,4 +1,5 @@
 
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 
@@ -13,7 +14,7 @@ export default function DoctorDashboard() {
         <CardContent>
           <p>This is your professional dashboard. Manage your schedule, view patient appointments, and handle consultations.</p>
            <div className="mt-4">
-            <Link href="/appointments" className="text-primary hover:underline">View your schedule</Link>
+            <Link href="/doctor-appointments" className="text-primary hover:underline">View your appointments</Link>
           </div>
         </CardContent>
       </Card>

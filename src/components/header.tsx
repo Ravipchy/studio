@@ -92,6 +92,15 @@ export function Header() {
              <div className="hidden md:flex items-center gap-2">
               <Button variant="ghost" asChild><Link href="/login">Log in</Link></Button>
               <Button asChild><Link href="/signup">Sign up</Link></Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="outline">Dashboards</Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                    <DropdownMenuItem asChild><Link href="/patient-dashboard">Patient Dashboard</Link></DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link href="/doctor-dashboard">Doctor Dashboard</Link></DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
             <ThemeToggle />
             <Sheet>
@@ -134,6 +143,15 @@ export function Header() {
                   <div className="mt-auto flex flex-col gap-2">
                     <Button variant="ghost" size="lg" asChild><Link href="/login">Log in</Link></Button>
                     <Button size="lg" asChild><Link href="/signup">Sign up</Link></Button>
+                     <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button size="lg" variant="outline">Dashboards</Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuItem asChild><Link href="/patient-dashboard">Patient Dashboard</Link></DropdownMenuItem>
+                            <DropdownMenuItem asChild><Link href="/doctor-dashboard">Doctor Dashboard</Link></DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                   </div>
                 </div>
               </SheetContent>
