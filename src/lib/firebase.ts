@@ -4,18 +4,17 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
-// TODO: Add your own Firebase configuration from your Firebase project settings
+// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyDCaNgCa9ViyRhAOx54YWrDcCrg2MXMiEE",
+  authDomain: "arogya-sathi-web.firebaseapp.com",
+  projectId: "arogya-sathi-web",
+  storageBucket: "arogya-sathi-web.appspot.com",
+  messagingSenderId: "98089851553",
+  appId: "1:98089851553:web:e960614b8b7159539beee0"
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
-
