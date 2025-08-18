@@ -1,6 +1,6 @@
 "use client";
 
-import { HeartPulse, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,10 +19,24 @@ const services = [
 
 const navLinks = [
   { href: "/", label: "Home" },
-  { href: "#", label: "About" },
-  { href: "#", label: "Health Record" },
-  { href: "#", label: "Contact Us" },
+  { href: "/about", label: "About" },
+  { href: "/doctors", label: "Services" },
+  { href: "/health-record", label: "Health Record" },
+  { href: "/contact", label: "Contact Us" },
 ];
+
+function RedCrossIcon() {
+  return (
+    <svg
+      className="h-8 w-8 text-red-500"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M13.5 3H10.5V10.5H3V13.5H10.5V21H13.5V13.5H21V10.5H13.5V3Z" />
+    </svg>
+  );
+}
 
 export function Header() {
   return (
@@ -30,24 +44,24 @@ export function Header() {
       <div className="container flex h-16 items-center">
         <div className="mr-4 md:mr-6 flex items-center">
           <Link href="/" className="flex items-center space-x-2">
-            <HeartPulse className="h-6 w-6 text-primary" />
-            <span className="font-bold font-headline inline-block">Arogya Sathi</span>
+            <RedCrossIcon />
+            <span className="font-bold font-headline inline-block text-lg">AROGYA SATHI</span>
           </Link>
         </div>
         <div className="flex w-full items-center justify-end md:justify-between">
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-            {navLinks.slice(0, 2).map(link => (
-              <Link key={link.label} href={link.href} className="transition-colors hover:text-foreground/80 text-foreground/60">{link.label}</Link>
-            ))}
+            <Link href="/" className="transition-colors hover:text-foreground/80 text-foreground/60">Home</Link>
+            <Link href="/about" className="transition-colors hover:text-foreground/80 text-foreground/60">About</Link>
             <DropdownMenu>
-              <DropdownMenuTrigger className="transition-colors hover:text-foreground/80 text-foreground/60 flex items-center outline-none">Services</DropdownMenuTrigger>
+              <DropdownMenuTrigger className="transition-colors hover:text-foreground/80 text-foreground/60 flex items-center outline-none">
+                Service
+              </DropdownMenuTrigger>
               <DropdownMenuContent>
-                {services.map(service => <DropdownMenuItem key={service}>{service}</DropdownMenuItem>)}
+                {services.map(service => <DropdownMenuItem key={service} asChild><Link href="/doctors">{service}</Link></DropdownMenuItem>)}
               </DropdownMenuContent>
             </DropdownMenu>
-            {navLinks.slice(2).map(link => (
-              <Link key={link.label} href={link.href} className="transition-colors hover:text-foreground/80 text-foreground/60">{link.label}</Link>
-            ))}
+            <Link href="/health-record" className="transition-colors hover:text-foreground/80 text-foreground/60">Health Record</Link>
+            <Link href="/contact" className="transition-colors hover:text-foreground/80 text-foreground/60">Contact Us</Link>
           </nav>
           <div className="flex items-center gap-2">
              <div className="hidden md:flex items-center gap-2">
@@ -66,8 +80,8 @@ export function Header() {
                 <div className="flex flex-col h-full">
                     <div className="border-b pb-4">
                         <Link href="/" className="flex items-center space-x-2">
-                            <HeartPulse className="h-6 w-6 text-primary" />
-                            <span className="font-bold font-headline">Arogya Sathi</span>
+                            <RedCrossIcon />
+                            <span className="font-bold font-headline">AROGYA SATHI</span>
                         </Link>
                     </div>
                   <nav className="flex flex-col gap-4 py-4">
@@ -77,7 +91,7 @@ export function Header() {
                     <div className="space-y-2">
                       <p className="text-lg font-medium">Services</p>
                       <div className="flex flex-col gap-2 pl-4">
-                        {services.map(service => <Link href="#" className="text-muted-foreground" key={service}>{service}</Link>)}
+                        {services.map(service => <Link href="/doctors" className="text-muted-foreground" key={service}>{service}</Link>)}
                       </div>
                     </div>
                   </nav>
