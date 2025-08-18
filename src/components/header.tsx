@@ -21,7 +21,7 @@ const services = [
   {label:"Pharmacy", href:"/pharmacy"}, 
   {label:"Home Care", href:"/home-care"}, 
   {label:"Lab Tests", href:"/lab-tests"}, 
-  {label:"Mental Health", href:"#"}
+  {label:"Mental Health", href:"/mental-health"}
 ];
 
 const navLinks = [
