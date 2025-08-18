@@ -1,38 +1,40 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ShoppingCart, Filter, X } from "lucide-react";
+import { ShoppingCart, Filter } from "lucide-react";
 import Image from "next/image";
 import { Badge } from "./ui/badge";
-import { PharmacyCartSidebar } from "./pharmacy-cart-sidebar";
+import { CartItem } from "@/app/pharmacy/page";
 
-const medicines = [
-  { name: "Paracetamol 500mg", brand: "Cipla", price: "25.00", oldPrice: "30.00", stock: true, image: "https://placehold.co/200x200.png", category: "general" },
-  { name: "Metformin 500mg", brand: "Sun Pharma", price: "55.00", oldPrice: null, stock: true, image: "https://placehold.co/200x200.png", category: "diabetes" },
-  { name: "Aspirin 75mg", brand: "Dr. Reddy's", price: "15.00", oldPrice: "20.00", stock: false, image: "https://placehold.co/200x200.png", category: "heart" },
-  { name: "Vitamin C 1000mg", brand: "Himalaya", price: "150.00", oldPrice: null, stock: true, image: "https://placehold.co/200x200.png", category: "vitamins" },
-  { name: "Dolo 650", brand: "Micro Labs", price: "30.00", oldPrice: null, stock: true, image: "https://placehold.co/200x200.png", category: "general" },
-  { name: "N95 Mask", brand: "Generic", price: "99.00", oldPrice: "150.00", stock: true, image: "https://placehold.co/200x200.png", category: "covid" },
-  { name: "Telma 40", brand: "Glenmark", price: "120.00", oldPrice: null, stock: true, image: "https://placehold.co/200x200.png", category: "heart" },
-  { name: "Calcium + Vit D3", brand: "Shelcal", price: "200.00", oldPrice: "250.00", stock: false, image: "https://placehold.co/200x200.png", category: "vitamins" },
+const medicines: (Omit<CartItem, 'quantity'> & {oldPrice: string | null, stock: boolean, category: string})[] = [
+  { id: 1, name: "Paracetamol 500mg", brand: "Cipla", price: "25.00", oldPrice: "30.00", stock: true, image: "https://placehold.co/200x200.png", category: "general" },
+  { id: 2, name: "Metformin 500mg", brand: "Sun Pharma", price: "55.00", oldPrice: null, stock: true, image: "https://placehold.co/200x200.png", category: "diabetes" },
+  { id: 3, name: "Aspirin 75mg", brand: "Dr. Reddy's", price: "15.00", oldPrice: "20.00", stock: false, image: "https://placehold.co/200x200.png", category: "heart" },
+  { id: 4, name: "Vitamin C 1000mg", brand: "Himalaya", price: "150.00", oldPrice: null, stock: true, image: "https://placehold.co/200x200.png", category: "vitamins" },
+  { id: 5, name: "Dolo 650", brand: "Micro Labs", price: "30.00", oldPrice: null, stock: true, image: "https://placehold.co/200x200.png", category: "general" },
+  { id: 6, name: "N95 Mask", brand: "Generic", price: "99.00", oldPrice: "150.00", stock: true, image: "https://placehold.co/200x200.png", category: "covid" },
+  { id: 7, name: "Telma 40", brand: "Glenmark", price: "120.00", oldPrice: null, stock: true, image: "https://placehold.co/200x200.png", category: "heart" },
+  { id: 8, name: "Calcium + Vit D3", brand: "Shelcal", price: "200.00", oldPrice: "250.00", stock: false, image: "https://placehold.co/200x200.png", category: "vitamins" },
 ];
 
-export function PharmacyListingSection() {
-  const [isCartOpen, setIsCartOpen] = useState(false);
+interface PharmacyListingSectionProps {
+  onAddToCart: (item: Omit<CartItem, 'quantity'>) => void;
+  onOpenCart: () => void;
+  cartCount: number;
+}
 
+export function PharmacyListingSection({ onAddToCart, onOpenCart, cartCount }: PharmacyListingSectionProps) {
   return (
     <section className="py-12 md:py-24 bg-muted/40">
       <div className="container">
         <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
           <h2 className="text-3xl font-bold font-headline">All Products</h2>
           <div className="flex items-center gap-4">
-             <Button variant="outline" onClick={() => setIsCartOpen(true)}>
-              <ShoppingCart className="mr-2 h-5 w-5" /> Cart (3)
+             <Button variant="outline" onClick={onOpenCart}>
+              <ShoppingCart className="mr-2 h-5 w-5" /> Cart ({cartCount})
             </Button>
             <Select>
               <SelectTrigger className="w-full md:w-[180px]">
@@ -111,7 +113,7 @@ export function PharmacyListingSection() {
                     <Badge variant={med.stock ? "default" : "destructive"} className={`mb-4 w-fit ${med.stock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                         {med.stock ? "In Stock" : "Out of Stock"}
                     </Badge>
-                    <Button className="w-full mt-auto" disabled={!med.stock}>
+                    <Button className="w-full mt-auto" disabled={!med.stock} onClick={() => onAddToCart(med)}>
                       <ShoppingCart className="mr-2 h-4 w-4" />
                       Add to Cart
                     </Button>
@@ -122,7 +124,6 @@ export function PharmacyListingSection() {
           </div>
         </div>
       </div>
-      <PharmacyCartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </section>
   );
 }

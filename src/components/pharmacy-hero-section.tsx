@@ -19,22 +19,19 @@ export function PharmacyHeroSection() {
           >
             <div className="space-y-4">
               <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none font-headline">
-                Your Health, Our Pharmacy
+                Book Medicines
               </h1>
               <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                Order medicines and healthcare essentials online, delivered to your doorstep.
+                Order medicines online with prescription upload & doorstep delivery.
               </p>
             </div>
             <div className="relative w-full max-w-lg pt-4">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
                 id="search-medicines"
-                placeholder="Search Medicines, Health Products, or Brands…"
+                placeholder="Search medicines by name..."
                 className="pl-10 h-12 rounded-full"
               />
-              <Button className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full" size="icon">
-                <Search className="h-5 w-5" />
-              </Button>
             </div>
           </motion.div>
           <motion.div
