@@ -9,7 +9,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyDCaNgCa9ViyRhAOx54YWrDcCrg2MXMiEE",
   authDomain: "arogya-sathi-web.firebaseapp.com",
   projectId: "arogya-sathi-web",
-  storageBucket: "arogya-sathi-web.appspot.com",
+  storageBucket: "arogya-sathi-web.firebasestorage.app",
   messagingSenderId: "98089851553",
   appId: "1:98089851553:web:e960614b8b7159539beee0"
 };
