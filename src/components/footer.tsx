@@ -30,7 +30,7 @@ export function Footer() {
           <h3 className="font-semibold font-headline mb-4">Quick Links</h3>
           <ul className="space-y-2 text-sm">
             <li><Link href="/" className="hover:underline">Home</Link></li>
-            <li><Link href="/doctors" className="hover:underline">Service</Link></li>
+            <li><Link href="/doctors" className="hover:underline">Find a Doctor</Link></li>
             <li><Link href="/about" className="hover:underline">About Us</Link></li>
             <li><Link href="/contact" className="hover:underline">Contact Us</Link></li>
             <li><Link href="#" className="hover:underline">FAQs</Link></li>
@@ -40,10 +40,10 @@ export function Footer() {
         <div>
           <h3 className="font-semibold font-headline mb-4">Our Services</h3>
           <ul className="space-y-2 text-sm">
-            <li><Link href="#" className="hover:underline">Doctor Appointment</Link></li>
-            <li><Link href="#" className="hover:underline">Book Ambulance</Link></li>
-            <li><Link href="#" className="hover:underline">Telemedicine</Link></li>
-            <li><Link href="#" className="hover:underline">Medical Report</Link></li>
+            <li><Link href="/doctors" className="hover:underline">Doctor Appointment</Link></li>
+            <li><Link href="/ambulance" className="hover:underline">Book Ambulance</Link></li>
+            <li><Link href="/telemedicine" className="hover:underline">Telemedicine</Link></li>
+            <li><Link href="/health-record" className="hover:underline">Medical Report</Link></li>
             <li><Link href="#" className="hover:underline">Pharmacy</Link></li>
             <li><Link href="#" className="hover:underline">Home Care</Link></li>
           </ul>

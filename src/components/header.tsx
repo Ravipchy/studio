@@ -16,7 +16,7 @@ const services = [
   {label:"Find Nearby Doctor", href:"/doctors"},
   {label:"Book Ambulance", href:"/ambulance"}, 
   {label:"Telemedicine", href:"/telemedicine"},
-  {label:"View Medical Report", href:"#"}, 
+  {label:"View Medical Report", href:"/health-record"}, 
   {label:"Pharmacy", href:"#"}, 
   {label:"Home Care", href:"#"}, 
   {label:"Lab Tests", href:"#"}, 
@@ -26,7 +26,7 @@ const services = [
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
-  { href: "#", label: "Services" },
+  { href: "#", label: "Services", isDropdown: true },
   { href: "/health-record", label: "Health Record" },
   { href: "/contact", label: "Contact Us" },
 ];
@@ -56,18 +56,20 @@ export function Header() {
         </div>
         <div className="flex w-full items-center justify-end md:justify-between">
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-            <Link href="/" className="transition-colors hover:text-foreground/80 text-foreground/60">Home</Link>
-            <Link href="/about" className="transition-colors hover:text-foreground/80 text-foreground/60">About</Link>
-            <DropdownMenu>
-              <DropdownMenuTrigger className="transition-colors hover:text-foreground/80 text-foreground/60 flex items-center outline-none">
-                Service
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                {services.map(service => <DropdownMenuItem key={service.label} asChild><Link href={service.href}>{service.label}</Link></DropdownMenuItem>)}
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <Link href="/health-record" className="transition-colors hover:text-foreground/80 text-foreground/60">Health Record</Link>
-            <Link href="/contact" className="transition-colors hover:text-foreground/80 text-foreground/60">Contact Us</Link>
+            {navLinks.map(link => (
+              link.isDropdown ? (
+                <DropdownMenu key={link.label}>
+                  <DropdownMenuTrigger className="transition-colors hover:text-foreground/80 text-foreground/60 flex items-center outline-none">
+                    {link.label}
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    {services.map(service => <DropdownMenuItem key={service.label} asChild><Link href={service.href}>{service.label}</Link></DropdownMenuItem>)}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Link key={link.label} href={link.href} className="transition-colors hover:text-foreground/80 text-foreground/60">{link.label}</Link>
+              )
+            ))}
           </nav>
           <div className="flex items-center gap-2">
              <div className="hidden md:flex items-center gap-2">
@@ -91,11 +93,11 @@ export function Header() {
                         </Link>
                     </div>
                   <nav className="flex flex-col gap-4 py-4">
-                    {navLinks.map(link => (
+                     {navLinks.filter(l => !l.isDropdown).map(link => (
                        <Link key={link.label} href={link.href} className="text-lg font-medium">{link.label}</Link>
                     ))}
-                    <div className="space-y-2">
-                      <p className="text-lg font-medium">Services</p>
+                    <div className="space-y-2 pt-2 border-t">
+                      <p className="text-lg font-medium text-muted-foreground">Services</p>
                       <div className="flex flex-col gap-2 pl-4">
                         {services.map(service => <Link href={service.href} className="text-muted-foreground" key={service.label}>{service.label}</Link>)}
                       </div>
