@@ -1,16 +1,35 @@
 
+"use client";
+
 import type { Metadata } from 'next';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
-import { AuthProvider } from '@/context/AuthContext';
+import { AuthProvider, useAuth } from '@/context/AuthContext';
+import { ChatbotWidget } from '@/components/chatbot-widget';
+import { usePathname } from 'next/navigation';
 
-export const metadata: Metadata = {
-  title: 'Arogya Sathi - Your Smart Healthcare Partner',
-  description: 'Designing a smart, affordable, accessible, and secure web platform for medical services across Hyderabad.',
-};
+// export const metadata: Metadata = {
+//   title: 'Arogya Sathi - Your Smart Healthcare Partner',
+//   description: 'Designing a smart, affordable, accessible, and secure web platform for medical services across Hyderabad.',
+// };
+
+const AppContent = ({ children }: { children: React.ReactNode }) => {
+  const { user } = useAuth();
+  const pathname = usePathname();
+  const noChatbotRoutes = ['/login', '/signup'];
+
+  return (
+    <div className="flex flex-col min-h-screen">
+      <Header />
+      <main className="flex-grow">{children}</main>
+      <Footer />
+      {user && !noChatbotRoutes.includes(pathname) && <ChatbotWidget />}
+    </div>
+  )
+}
 
 export default function RootLayout({
   children,
@@ -20,6 +39,8 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full" suppressHydrationWarning>
       <head>
+        <title>Arogya Sathi - Your Smart Healthcare Partner</title>
+        <meta name="description" content="Designing a smart, affordable, accessible, and secure web platform for medical services across Hyderabad." />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -33,11 +54,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <div className="flex flex-col min-h-screen">
-              <Header />
-              <main className="flex-grow">{children}</main>
-              <Footer />
-            </div>
+            <AppContent>{children}</AppContent>
             <Toaster />
           </ThemeProvider>
         </AuthProvider>
