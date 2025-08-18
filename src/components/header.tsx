@@ -66,24 +66,25 @@ function AuthNav() {
         if (currentPath.includes('doctor-')) {
             setUser({ role: 'doctor' });
         } else {
-            setUser({ role: 'patient'});
+            // Default to patient for any other page, or could be null if not logged in
+            setUser({ role: 'patient' });
         }
     }, []);
 
-    const handleLogout = () => {
-        setUser({ role: null });
-    }
-    
     if (!isMounted) {
         return null;
     }
+
+    if (!user.role) {
+      return (
+        <>
+            <Button variant="ghost" asChild><Link href="/login">Log in</Link></Button>
+            <Button asChild><Link href="/signup">Sign up</Link></Button>
+        </>
+      )
+    }
     
-    return !user.role ? (
-      <>
-        <Button variant="ghost" asChild><Link href="/login">Log in</Link></Button>
-        <Button asChild><Link href="/signup">Sign up</Link></Button>
-      </>
-    ) : (
+    return (
       <DropdownMenu>
           <DropdownMenuTrigger asChild>
               <Button variant="secondary">
@@ -92,7 +93,7 @@ function AuthNav() {
               </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-                <DropdownMenuItem onClick={handleLogout}>
+                <DropdownMenuItem onClick={() => setUser({role: null})}>
                   <LogOut className="mr-2"/> Logout
               </DropdownMenuItem>
           </DropdownMenuContent>
@@ -103,8 +104,10 @@ function AuthNav() {
 export function Header() {
     // This is a mock state. In a real app, you would get this from your Auth context.
     const [userRole, setUserRole] = React.useState<"patient" | "doctor" | null>(null);
+    const [isMounted, setIsMounted] = React.useState(false);
 
      React.useEffect(() => {
+        setIsMounted(true);
         // Simulate role detection based on URL for demo purposes
         const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
         if (currentPath.includes('doctor-')) {
@@ -129,7 +132,7 @@ export function Header() {
         </div>
         <div className="flex w-full items-center justify-end md:justify-between">
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-            {currentNavLinks.map(link => (
+            {isMounted && currentNavLinks.map(link => (
               link.isDropdown ? (
                 <DropdownMenu key={link.label}>
                   <DropdownMenuTrigger className="transition-colors hover:text-foreground/80 text-foreground/60 flex items-center outline-none">
@@ -178,10 +181,10 @@ export function Header() {
                         </Link>
                     </div>
                   <nav className="flex flex-col gap-4 py-4">
-                     {currentNavLinks.filter(l => !l.isDropdown).map(link => (
+                     {isMounted && currentNavLinks.filter(l => !l.isDropdown).map(link => (
                        <Link key={link.label} href={link.href} className="text-lg font-medium">{link.label}</Link>
                     ))}
-                    {userRole !== 'doctor' && (
+                    {isMounted && userRole !== 'doctor' && (
                         <div className="space-y-2 pt-2 border-t">
                             <p className="text-lg font-medium text-muted-foreground">Services</p>
                             <div className="flex flex-col gap-2 pl-4">
