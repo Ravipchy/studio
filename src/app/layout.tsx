@@ -1,35 +1,12 @@
 
 "use client";
 
-import type { Metadata } from 'next';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
-import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { ChatbotWidget } from '@/components/chatbot-widget';
-import { usePathname } from 'next/navigation';
-
-// export const metadata: Metadata = {
-//   title: 'Arogya Sathi - Your Smart Healthcare Partner',
-//   description: 'Designing a smart, affordable, accessible, and secure web platform for medical services across Hyderabad.',
-// };
-
-const AppContent = ({ children }: { children: React.ReactNode }) => {
-  const { user } = useAuth();
-  const pathname = usePathname();
-  const noChatbotRoutes = ['/login', '/signup'];
-
-  return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
-      <main className="flex-grow">{children}</main>
-      <Footer />
-      {user && !noChatbotRoutes.includes(pathname) && <ChatbotWidget />}
-    </div>
-  )
-}
 
 export default function RootLayout({
   children,
@@ -47,17 +24,20 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased h-full">
-        <AuthProvider>
           <ThemeProvider
             attribute="class"
             defaultTheme="light"
             enableSystem
             disableTransitionOnChange
           >
-            <AppContent>{children}</AppContent>
+            <div className="flex flex-col min-h-screen">
+              <Header />
+              <main className="flex-grow">{children}</main>
+              <Footer />
+              <ChatbotWidget />
+            </div>
             <Toaster />
           </ThemeProvider>
-        </AuthProvider>
       </body>
     </html>
   );

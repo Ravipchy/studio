@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Menu, User, LogOut } from "lucide-react";
+import { Menu } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,10 +13,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ThemeToggle } from "./theme-toggle";
-import { useAuth } from "@/context/AuthContext";
-import { auth } from "@/lib/firebase";
-import { signOut } from "firebase/auth";
-import { useRouter } from "next/navigation";
 
 const patientServices = [
   {label:"Find Nearby Doctor", href:"/doctors"},
@@ -30,17 +26,12 @@ const patientServices = [
   {label:"Mental Health", href:"/mental-health"}
 ];
 
-const doctorNavLinks = [
-    { href: "/doctor-dashboard", label: "Dashboard" },
-    { href: "/doctor-appointments", label: "Appointments" },
-    { href: "/telemedicine", label: "Telemedicine" },
-    { href: "/health-record", label: "Reports" },
-];
-
-const patientNavLinks = [
+const navLinks = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
   { href: "#", label: "Services", isDropdown: true },
+    { href: "/doctor-dashboard", label: "Doctor View" },
+    { href: "/patient-dashboard", label: "Patient View" },
   { href: "/contact", label: "Contact Us" },
 ];
 
@@ -57,53 +48,11 @@ function RedCrossIcon() {
   );
 }
 
-function AuthNav() {
-  const { user, userRole } = useAuth();
-  const router = useRouter();
-
-  const handleLogout = async () => {
-      await signOut(auth);
-      router.push('/login');
-  };
-
-  if (!user) {
-    return (
-      <>
-          <Button variant="ghost" asChild><Link href="/login">Log in</Link></Button>
-          <Button asChild><Link href="/signup">Sign up</Link></Button>
-      </>
-    )
-  }
-  
-  return (
-    <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-            <Button variant="secondary">
-                <User className="mr-2"/>
-                {user.displayName || "User"}
-            </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-              <DropdownMenuItem onClick={() => router.push(userRole === 'doctor' ? '/doctor-dashboard' : '/patient-dashboard')}>
-                Dashboard
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleLogout}>
-                <LogOut className="mr-2"/> Logout
-            </DropdownMenuItem>
-        </DropdownMenuContent>
-    </DropdownMenu>
-  )
-}
-
 function HeaderContent() {
-    const { userRole } = useAuth();
-
-    const currentNavLinks = userRole === 'doctor' ? doctorNavLinks : patientNavLinks;
-
     return (
         <div className="flex w-full items-center justify-end md:justify-between">
             <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-            {currentNavLinks.map(link => (
+            {navLinks.map(link => (
                 link.isDropdown ? (
                 <DropdownMenu key={link.label}>
                     <DropdownMenuTrigger className="transition-colors hover:text-foreground/80 text-foreground/60 flex items-center outline-none">
@@ -132,9 +81,6 @@ function HeaderContent() {
             ))}
             </nav>
             <div className="flex items-center gap-2">
-                <div className="hidden md:flex items-center gap-2">
-                   <AuthNav />
-                </div>
                 <ThemeToggle />
                 <Sheet>
                     <SheetTrigger asChild>
@@ -152,32 +98,27 @@ function HeaderContent() {
                             </Link>
                         </div>
                         <nav className="flex flex-col gap-4 py-4">
-                            {currentNavLinks.filter(l => !l.isDropdown).map(link => (
+                            {navLinks.filter(l => !l.isDropdown).map(link => (
                             <Link key={link.label} href={link.href} className="text-lg font-medium">{link.label}</Link>
                             ))}
-                            {userRole !== 'doctor' && (
-                                <div className="space-y-2 pt-2 border-t">
-                                    <p className="text-lg font-medium text-muted-foreground">Services</p>
-                                    <div className="flex flex-col gap-2 pl-4">
-                                        {patientServices.map(service => (
-                                        <div key={service.label}>
-                                            <Link href={service.href} className="text-muted-foreground font-semibold">{service.label}</Link>
-                                            {service.subItems && (
-                                            <div className="flex flex-col gap-1 pl-4 pt-1">
-                                                {service.subItems.map(subItem => (
-                                                <Link href={subItem.href} className="text-muted-foreground" key={subItem.label}>{subItem.label}</Link>
-                                                ))}
-                                            </div>
-                                            )}
+                            <div className="space-y-2 pt-2 border-t">
+                                <p className="text-lg font-medium text-muted-foreground">Services</p>
+                                <div className="flex flex-col gap-2 pl-4">
+                                    {patientServices.map(service => (
+                                    <div key={service.label}>
+                                        <Link href={service.href} className="text-muted-foreground font-semibold">{service.label}</Link>
+                                        {service.subItems && (
+                                        <div className="flex flex-col gap-1 pl-4 pt-1">
+                                            {service.subItems.map(subItem => (
+                                            <Link href={subItem.href} className="text-muted-foreground" key={subItem.label}>{subItem.label}</Link>
+                                            ))}
                                         </div>
-                                        ))}
+                                        )}
                                     </div>
+                                    ))}
                                 </div>
-                            )}
+                            </div>
                         </nav>
-                        <div className="mt-auto flex flex-col gap-2">
-                           <AuthNav />
-                        </div>
                     </div>
                     </SheetContent>
                 </Sheet>
@@ -185,7 +126,6 @@ function HeaderContent() {
         </div>
     );
 }
-
 
 export function Header() {
   const [isMounted, setIsMounted] = useState(false);

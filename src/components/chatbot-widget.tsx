@@ -8,7 +8,6 @@ import { Card, CardHeader, CardContent, CardFooter, CardTitle } from './ui/card'
 import { Input } from './ui/input';
 import { ScrollArea } from './ui/scroll-area';
 import { MessageCircle, Send, X, Bot } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
 import { chat, type ChatMessage } from '@/ai/flows/chat-flow';
 
 export function ChatbotWidget() {
@@ -19,7 +18,6 @@ export function ChatbotWidget() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const { user, userRole } = useAuth();
 
   const toggleOpen = () => setIsOpen(prev => !prev);
 
@@ -50,7 +48,7 @@ export function ChatbotWidget() {
 
     try {
         const history = newMessages.slice(0, -1);
-        const response = await chat(userMessage.content, history, userRole ?? undefined);
+        const response = await chat(userMessage.content, history, 'guest');
         setMessages(prev => [...prev, { role: 'model', content: response }]);
     } catch (error) {
         console.error("Chatbot error:", error);
