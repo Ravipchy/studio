@@ -10,10 +10,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSeparator,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ThemeToggle } from "./theme-toggle";
@@ -58,20 +54,68 @@ function RedCrossIcon() {
   );
 }
 
-export function Header() {
+function AuthNav() {
     // This is a mock state. In a real app, you would get this from your Auth context.
     const [user, setUser] = React.useState<{role: "patient" | "doctor" | null}>({role: null});
+    const [isMounted, setIsMounted] = React.useState(false);
 
+    React.useEffect(() => {
+        setIsMounted(true);
+        // Simulate role switching for demo
+        const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+        if (currentPath.includes('doctor-')) {
+            setUser({ role: 'doctor' });
+        } else {
+            setUser({ role: 'patient'});
+        }
+    }, []);
 
-    const handleLogin = (selectedRole: "patient" | "doctor") => {
-        setUser({ role: selectedRole });
-    }
     const handleLogout = () => {
         setUser({ role: null });
     }
+    
+    if (!isMounted) {
+        return null;
+    }
+    
+    return !user.role ? (
+      <>
+        <Button variant="ghost" asChild><Link href="/login">Log in</Link></Button>
+        <Button asChild><Link href="/signup">Sign up</Link></Button>
+      </>
+    ) : (
+      <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+              <Button variant="secondary">
+                  <User className="mr-2"/>
+                  {user.role === 'doctor' ? 'Dr. Smith' : 'John Doe'}
+              </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2"/> Logout
+              </DropdownMenuItem>
+          </DropdownMenuContent>
+      </DropdownMenu>
+    )
+}
 
-    const currentNavLinks = user?.role === 'doctor' ? doctorNavLinks : patientNavLinks;
-    const currentServices = user?.role === 'doctor' ? [] : patientServices;
+export function Header() {
+    // This is a mock state. In a real app, you would get this from your Auth context.
+    const [userRole, setUserRole] = React.useState<"patient" | "doctor" | null>(null);
+
+     React.useEffect(() => {
+        // Simulate role detection based on URL for demo purposes
+        const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+        if (currentPath.includes('doctor-')) {
+            setUserRole('doctor');
+        } else {
+            setUserRole('patient');
+        }
+    }, []);
+
+    const currentNavLinks = userRole === 'doctor' ? doctorNavLinks : patientNavLinks;
+    const currentServices = userRole === 'doctor' ? [] : patientServices;
 
 
   return (
@@ -115,26 +159,7 @@ export function Header() {
           </nav>
           <div className="flex items-center gap-2">
              <div className="hidden md:flex items-center gap-2">
-              {!user.role ? (
-                  <>
-                    <Button variant="ghost" asChild><Link href="/login">Log in</Link></Button>
-                    <Button asChild><Link href="/signup">Sign up</Link></Button>
-                  </>
-              ) : (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="secondary">
-                            <User className="mr-2"/>
-                            {user.role === 'doctor' ? 'Dr. Smith' : 'John Doe'}
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                         <DropdownMenuItem onClick={handleLogout}>
-                            <LogOut className="mr-2"/> Logout
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-              )}
+                <AuthNav />
             </div>
             <ThemeToggle />
             <Sheet>
@@ -156,7 +181,7 @@ export function Header() {
                      {currentNavLinks.filter(l => !l.isDropdown).map(link => (
                        <Link key={link.label} href={link.href} className="text-lg font-medium">{link.label}</Link>
                     ))}
-                    {user.role !== 'doctor' && (
+                    {userRole !== 'doctor' && (
                         <div className="space-y-2 pt-2 border-t">
                             <p className="text-lg font-medium text-muted-foreground">Services</p>
                             <div className="flex flex-col gap-2 pl-4">
@@ -177,14 +202,7 @@ export function Header() {
                     )}
                   </nav>
                   <div className="mt-auto flex flex-col gap-2">
-                    {!user.role ? (
-                        <>
-                        <Button variant="ghost" size="lg" asChild><Link href="/login">Log in</Link></Button>
-                        <Button size="lg" asChild><Link href="/signup">Sign up</Link></Button>
-                        </>
-                    ) : (
-                        <Button size="lg" onClick={handleLogout}><LogOut className="mr-2"/> Logout</Button>
-                    )}
+                     <AuthNav />
                   </div>
                 </div>
               </SheetContent>
