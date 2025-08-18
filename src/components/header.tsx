@@ -1,7 +1,7 @@
 
 "use client";
 
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import { Menu, User, LogOut } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -30,7 +30,7 @@ const doctorNavLinks = [
     { href: "/doctor-dashboard", label: "Dashboard" },
     { href: "/doctor-appointments", label: "Appointments" },
     { href: "/telemedicine", label: "Telemedicine" },
-    { href: "/health-record", label: "Reports" }, // Assuming doctors also access reports
+    { href: "/health-record", label: "Reports" },
     { href: "#", label: "Profile" },
 ];
 
@@ -55,18 +55,15 @@ function RedCrossIcon() {
 }
 
 function AuthNav() {
-    // This is a mock state. In a real app, you would get this from your Auth context.
-    const [user, setUser] = React.useState<{role: "patient" | "doctor" | null}>({role: null});
-    const [isMounted, setIsMounted] = React.useState(false);
+    const [user, setUser] = useState<{role: "patient" | "doctor" | null}>({role: null});
+    const [isMounted, setIsMounted] = useState(false);
 
-    React.useEffect(() => {
+    useEffect(() => {
         setIsMounted(true);
-        // Simulate role switching for demo
         const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
         if (currentPath.includes('doctor-')) {
             setUser({ role: 'doctor' });
         } else {
-            // Default to patient for any other page, or could be null if not logged in
             setUser({ role: 'patient' });
         }
     }, []);
@@ -102,13 +99,11 @@ function AuthNav() {
 }
 
 export function Header() {
-    // This is a mock state. In a real app, you would get this from your Auth context.
-    const [userRole, setUserRole] = React.useState<"patient" | "doctor" | null>(null);
-    const [isMounted, setIsMounted] = React.useState(false);
+    const [userRole, setUserRole] = useState<"patient" | "doctor" | null>(null);
+    const [isMounted, setIsMounted] = useState(false);
 
-     React.useEffect(() => {
+     useEffect(() => {
         setIsMounted(true);
-        // Simulate role detection based on URL for demo purposes
         const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
         if (currentPath.includes('doctor-')) {
             setUserRole('doctor');
@@ -131,90 +126,91 @@ export function Header() {
           </Link>
         </div>
         <div className="flex w-full items-center justify-end md:justify-between">
-          {isMounted && (
-            <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-              {currentNavLinks.map(link => (
-                link.isDropdown ? (
-                  <DropdownMenu key={link.label}>
-                    <DropdownMenuTrigger className="transition-colors hover:text-foreground/80 text-foreground/60 flex items-center outline-none">
-                      {link.label}
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      {currentServices.map(service => (
-                        <React.Fragment key={service.label}>
-                          <DropdownMenuItem asChild><Link href={service.href}>{service.label}</Link></DropdownMenuItem>
-                          {service.subItems && (
-                            <>
-                              {service.subItems.map(subItem => (
-                                <DropdownMenuItem key={subItem.label} asChild className="pl-6">
-                                  <Link href={subItem.href}>{subItem.label}</Link>
-                                </DropdownMenuItem>
-                              ))}
-                            </>
-                          )}
-                        </React.Fragment>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                ) : (
-                  <Link key={link.label} href={link.href} className="transition-colors hover:text-foreground/80 text-foreground/60">{link.label}</Link>
-                )
-              ))}
-            </nav>
-          )}
-          <div className="flex items-center gap-2">
-             <div className="hidden md:flex items-center gap-2">
-                <AuthNav />
-            </div>
-            <ThemeToggle />
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="outline" size="icon" className="md:hidden">
-                  <Menu className="h-5 w-5" />
-                  <span className="sr-only">Toggle Menu</span>
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-full max-w-sm">
-                <div className="flex flex-col h-full">
-                    <div className="border-b pb-4">
-                        <Link href="/" className="flex items-center space-x-2">
-                            <RedCrossIcon />
-                            <span className="font-bold font-headline">AROGYA SATHI</span>
-                        </Link>
-                    </div>
-                  {isMounted && (
-                    <nav className="flex flex-col gap-4 py-4">
-                      {currentNavLinks.filter(l => !l.isDropdown).map(link => (
-                        <Link key={link.label} href={link.href} className="text-lg font-medium">{link.label}</Link>
-                      ))}
-                      {userRole !== 'doctor' && (
-                          <div className="space-y-2 pt-2 border-t">
-                              <p className="text-lg font-medium text-muted-foreground">Services</p>
-                              <div className="flex flex-col gap-2 pl-4">
-                                  {currentServices.map(service => (
-                                  <div key={service.label}>
-                                      <Link href={service.href} className="text-muted-foreground font-semibold">{service.label}</Link>
-                                      {service.subItems && (
-                                      <div className="flex flex-col gap-1 pl-4 pt-1">
-                                          {service.subItems.map(subItem => (
-                                          <Link href={subItem.href} className="text-muted-foreground" key={subItem.label}>{subItem.label}</Link>
-                                          ))}
-                                      </div>
-                                      )}
-                                  </div>
-                                  ))}
-                              </div>
-                          </div>
-                      )}
-                    </nav>
-                  )}
-                  <div className="mt-auto flex flex-col gap-2">
-                     <AuthNav />
-                  </div>
+          
+          {isMounted ? (
+            <>
+              <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+                {currentNavLinks.map(link => (
+                  link.isDropdown ? (
+                    <DropdownMenu key={link.label}>
+                      <DropdownMenuTrigger className="transition-colors hover:text-foreground/80 text-foreground/60 flex items-center outline-none">
+                        {link.label}
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        {currentServices.map(service => (
+                          <React.Fragment key={service.label}>
+                            <DropdownMenuItem asChild><Link href={service.href}>{service.label}</Link></DropdownMenuItem>
+                            {service.subItems && (
+                              <>
+                                {service.subItems.map(subItem => (
+                                  <DropdownMenuItem key={subItem.label} asChild className="pl-6">
+                                    <Link href={subItem.href}>{subItem.label}</Link>
+                                  </DropdownMenuItem>
+                                ))}
+                              </>
+                            )}
+                          </React.Fragment>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  ) : (
+                    <Link key={link.label} href={link.href} className="transition-colors hover:text-foreground/80 text-foreground/60">{link.label}</Link>
+                  )
+                ))}
+              </nav>
+              <div className="flex items-center gap-2">
+                 <div className="hidden md:flex items-center gap-2">
+                    <AuthNav />
                 </div>
-              </SheetContent>
-            </Sheet>
-          </div>
+                <ThemeToggle />
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button variant="outline" size="icon" className="md:hidden">
+                      <Menu className="h-5 w-5" />
+                      <span className="sr-only">Toggle Menu</span>
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="left" className="w-full max-w-sm">
+                    <div className="flex flex-col h-full">
+                        <div className="border-b pb-4">
+                            <Link href="/" className="flex items-center space-x-2">
+                                <RedCrossIcon />
+                                <span className="font-bold font-headline">AROGYA SATHI</span>
+                            </Link>
+                        </div>
+                        <nav className="flex flex-col gap-4 py-4">
+                          {currentNavLinks.filter(l => !l.isDropdown).map(link => (
+                            <Link key={link.label} href={link.href} className="text-lg font-medium">{link.label}</Link>
+                          ))}
+                          {userRole !== 'doctor' && (
+                              <div className="space-y-2 pt-2 border-t">
+                                  <p className="text-lg font-medium text-muted-foreground">Services</p>
+                                  <div className="flex flex-col gap-2 pl-4">
+                                      {currentServices.map(service => (
+                                      <div key={service.label}>
+                                          <Link href={service.href} className="text-muted-foreground font-semibold">{service.label}</Link>
+                                          {service.subItems && (
+                                          <div className="flex flex-col gap-1 pl-4 pt-1">
+                                              {service.subItems.map(subItem => (
+                                              <Link href={subItem.href} className="text-muted-foreground" key={subItem.label}>{subItem.label}</Link>
+                                              ))}
+                                          </div>
+                                          )}
+                                      </div>
+                                      ))}
+                                  </div>
+                              </div>
+                          )}
+                        </nav>
+                      <div className="mt-auto flex flex-col gap-2">
+                         <AuthNav />
+                      </div>
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              </div>
+            </>
+          ) : null}
         </div>
       </div>
     </header>
