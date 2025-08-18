@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 
 function RedCrossIcon() {
@@ -46,6 +47,7 @@ export function Footer() {
             <li><Link href="/health-record" className="hover:underline">Medical Report</Link></li>
             <li><Link href="/pharmacy" className="hover:underline">Pharmacy</Link></li>
             <li><Link href="/home-care" className="hover:underline">Home Care</Link></li>
+            <li><Link href="/lab-tests" className="hover:underline">Lab Tests</Link></li>
           </ul>
         </div>
         <div className="bg-white text-gray-800 p-4 rounded-lg">

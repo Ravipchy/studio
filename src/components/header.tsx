@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Menu } from "lucide-react";
@@ -19,7 +20,7 @@ const services = [
   {label:"View Medical Report", href:"/health-record"}, 
   {label:"Pharmacy", href:"/pharmacy"}, 
   {label:"Home Care", href:"/home-care"}, 
-  {label:"Lab Tests", href:"#"}, 
+  {label:"Lab Tests", href:"/lab-tests"}, 
   {label:"Mental Health", href:"#"}
 ];
 
