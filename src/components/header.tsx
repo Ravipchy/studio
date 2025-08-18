@@ -90,8 +90,8 @@ export function Header() {
           </nav>
           <div className="flex items-center gap-2">
              <div className="hidden md:flex items-center gap-2">
-              <Button variant="ghost">Log in</Button>
-              <Button>Sign up</Button>
+              <Button variant="ghost" asChild><Link href="/login">Log in</Link></Button>
+              <Button asChild><Link href="/signup">Sign up</Link></Button>
             </div>
             <ThemeToggle />
             <Sheet>
@@ -132,8 +132,8 @@ export function Header() {
                     </div>
                   </nav>
                   <div className="mt-auto flex flex-col gap-2">
-                    <Button variant="ghost" size="lg">Log in</Button>
-                    <Button size="lg">Sign up</Button>
+                    <Button variant="ghost" size="lg" asChild><Link href="/login">Log in</Link></Button>
+                    <Button size="lg" asChild><Link href="/signup">Sign up</Link></Button>
                   </div>
                 </div>
               </SheetContent>
