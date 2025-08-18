@@ -16,6 +16,7 @@ import {
 import { Star, MapPin, Stethoscope, Search, Calendar, Video } from "lucide-react";
 import Image from "next/image";
 import { DoctorProfileModal } from "./doctor-profile-modal";
+import { Badge } from "@/components/ui/badge";
 
 const doctors = [
   {
