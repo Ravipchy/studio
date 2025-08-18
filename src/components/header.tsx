@@ -17,7 +17,7 @@ const services = [
   {label:"Book Ambulance", href:"/ambulance"}, 
   {label:"Telemedicine", href:"/telemedicine"},
   {label:"View Medical Report", href:"/health-record"}, 
-  {label:"Pharmacy", href:"#"}, 
+  {label:"Pharmacy", href:"/pharmacy"}, 
   {label:"Home Care", href:"#"}, 
   {label:"Lab Tests", href:"#"}, 
   {label:"Mental Health", href:"#"}
