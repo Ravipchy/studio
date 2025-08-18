@@ -1,9 +1,12 @@
+
 "use client";
 
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Syringe, User, FlaskConical, ShieldCheck, HeartPulse, Stethoscope } from "lucide-react";
 import { motion } from "framer-motion";
+import { HomeCareBookingModal } from "./home-care-booking-modal";
 
 const services = [
   {
@@ -39,7 +42,16 @@ const services = [
 ];
 
 export function HomeCareServices() {
+  const [isBookingModalOpen, setBookingModalOpen] = useState(false);
+  const [selectedService, setSelectedService] = useState("");
+
+  const handleBookNow = (title: string) => {
+    setSelectedService(title);
+    setBookingModalOpen(true);
+  };
+
   return (
+    <>
     <section className="py-12 md:py-24 bg-background">
       <div className="container">
         <div className="text-center mb-12">
@@ -65,7 +77,7 @@ export function HomeCareServices() {
                 </CardHeader>
                 <CardContent className="flex-grow flex flex-col justify-between">
                   <CardDescription className="mb-4">{service.description}</CardDescription>
-                  <Button variant="outline">Book Now</Button>
+                  <Button variant="outline" onClick={() => handleBookNow(service.title)}>Book Now</Button>
                 </CardContent>
               </Card>
             </motion.div>
@@ -73,5 +85,12 @@ export function HomeCareServices() {
         </div>
       </div>
     </section>
+    
+    <HomeCareBookingModal 
+      isOpen={isBookingModalOpen}
+      onClose={() => setBookingModalOpen(false)}
+      serviceTitle={selectedService}
+    />
+    </>
   );
 }

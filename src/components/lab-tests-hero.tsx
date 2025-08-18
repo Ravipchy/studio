@@ -4,6 +4,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Button } from "./ui/button";
+import Link from "next/link";
 
 export function LabTestsHero() {
   return (
@@ -26,7 +27,9 @@ export function LabTestsHero() {
             </div>
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Button size="lg">Book a Test</Button>
-              <Button size="lg" variant="outline">View Packages</Button>
+              <Button asChild variant="outline" size="lg">
+                <Link href="/lab-tests/history">View Booking History</Link>
+              </Button>
             </div>
           </motion.div>
           <motion.div

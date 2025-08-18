@@ -1,6 +1,7 @@
 
 "use client";
 
+import * as React from "react";
 import { Menu } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ThemeToggle } from "./theme-toggle";
@@ -19,9 +21,9 @@ const services = [
   {label:"Telemedicine", href:"/telemedicine"},
   {label:"View Medical Report", href:"/health-record"},
   {label:"My Appointments", href:"/appointments"},
-  {label:"Pharmacy", href:"/pharmacy"}, 
-  {label:"Home Care", href:"/home-care"}, 
-  {label:"Lab Tests", href:"/lab-tests"}, 
+  {label:"Pharmacy", href:"/pharmacy", subItems: [{label: "Order History", href: "/pharmacy/orders"}]},
+  {label:"Home Care", href:"/home-care", subItems: [{label: "Booking History", href: "/home-care/history"}]}, 
+  {label:"Lab Tests", href:"/lab-tests", subItems: [{label: "Booking History", href: "/lab-tests/history"}]}, 
   {label:"Mental Health", href:"/mental-health"}
 ];
 
@@ -65,7 +67,20 @@ export function Header() {
                     {link.label}
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    {services.map(service => <DropdownMenuItem key={service.label} asChild><Link href={service.href}>{service.label}</Link></DropdownMenuItem>)}
+                    {services.map(service => (
+                      <React.Fragment key={service.label}>
+                        <DropdownMenuItem asChild><Link href={service.href}>{service.label}</Link></DropdownMenuItem>
+                        {service.subItems && (
+                          <>
+                            {service.subItems.map(subItem => (
+                              <DropdownMenuItem key={subItem.label} asChild className="pl-6">
+                                <Link href={subItem.href}>{subItem.label}</Link>
+                              </DropdownMenuItem>
+                            ))}
+                          </>
+                        )}
+                      </React.Fragment>
+                    ))}
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
@@ -101,7 +116,18 @@ export function Header() {
                     <div className="space-y-2 pt-2 border-t">
                       <p className="text-lg font-medium text-muted-foreground">Services</p>
                       <div className="flex flex-col gap-2 pl-4">
-                        {services.map(service => <Link href={service.href} className="text-muted-foreground" key={service.label}>{service.label}</Link>)}
+                        {services.map(service => (
+                          <div key={service.label}>
+                            <Link href={service.href} className="text-muted-foreground font-semibold">{service.label}</Link>
+                            {service.subItems && (
+                              <div className="flex flex-col gap-1 pl-4 pt-1">
+                                {service.subItems.map(subItem => (
+                                   <Link href={subItem.href} className="text-muted-foreground" key={subItem.label}>{subItem.label}</Link>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))}
                       </div>
                     </div>
                   </nav>

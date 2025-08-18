@@ -1,10 +1,12 @@
 
 "use client";
 
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Heart, Droplets, Shield, Bone, Activity, PersonStanding, TestTube } from "lucide-react";
 import { motion } from "framer-motion";
+import { LabTestBookingModal } from "./lab-test-booking-modal";
 
 const packages = [
   { icon: PersonStanding, title: "Full Body Checkup", description: "50+ tests included", price: "999" },
@@ -16,7 +18,16 @@ const packages = [
 ];
 
 export function LabTestsPackages() {
+  const [isBookingModalOpen, setBookingModalOpen] = useState(false);
+  const [selectedTest, setSelectedTest] = useState("");
+
+  const handleBookNow = (title: string) => {
+    setSelectedTest(title);
+    setBookingModalOpen(true);
+  };
+
   return (
+    <>
     <section className="py-12 md:py-24 bg-background">
       <div className="container">
         <div className="text-center mb-12">
@@ -44,7 +55,7 @@ export function LabTestsPackages() {
                   <CardDescription className="mb-4">{pkg.description}</CardDescription>
                   <div className="flex-grow"></div>
                   <p className="text-2xl font-bold mb-4">₹{pkg.price}</p>
-                  <Button variant="outline">Book Now</Button>
+                  <Button variant="outline" onClick={() => handleBookNow(pkg.title)}>Book Now</Button>
                 </CardContent>
               </Card>
             </motion.div>
@@ -52,5 +63,12 @@ export function LabTestsPackages() {
         </div>
       </div>
     </section>
+
+    <LabTestBookingModal
+      isOpen={isBookingModalOpen}
+      onClose={() => setBookingModalOpen(false)}
+      testTitle={selectedTest}
+    />
+    </>
   );
 }

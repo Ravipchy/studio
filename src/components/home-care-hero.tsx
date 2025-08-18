@@ -1,9 +1,11 @@
+
 "use client";
 
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Button } from "./ui/button";
 import { Phone } from "lucide-react";
+import Link from "next/link";
 
 export function HomeCareHero() {
   return (
@@ -26,9 +28,9 @@ export function HomeCareHero() {
             </div>
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Button size="lg">Book Home Visit</Button>
-              <Button size="lg" variant="outline">
-                <Phone className="mr-2 h-5 w-5" /> Call Now
-              </Button>
+               <Button asChild variant="outline" size="lg">
+                    <Link href="/home-care/history">View Booking History</Link>
+                </Button>
             </div>
           </motion.div>
           <motion.div
