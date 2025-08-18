@@ -118,8 +118,16 @@ export function DoctorsNearbySection() {
                     <CardTitle className="text-xl">Find Nearby Doctor</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="relative h-[500px] bg-gray-200 rounded-md">
-                        <Image src="https://placehold.co/600x500.png" layout="fill" objectFit="cover" alt="Map of doctors" data-ai-hint="map clinics" />
+                    <div className="relative h-[500px] bg-gray-200 rounded-md overflow-hidden">
+                       <iframe 
+                           src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3807.190475350566!2d78.4746645148766!3d17.4029235880709!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bcb975b5b0b0b0b%3A0x1b0b0b0b0b0b0b0b!2sHyderabad%2C%20Telangana!5e0!3m2!1sen!2sin!4v1620020000000!5m2!1sen!2sin" 
+                           width="100%" 
+                           height="100%" 
+                           style={{border:0}} 
+                           allowFullScreen={false} 
+                           loading="lazy"
+                           title="Google map of Hyderabad"
+                           ></iframe>
                     </div>
                 </CardContent>
             </Card>
