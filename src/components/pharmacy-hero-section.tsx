@@ -1,3 +1,4 @@
+
 "use client";
 
 import { motion } from "framer-motion";
@@ -5,6 +6,7 @@ import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { Button } from "./ui/button";
+import Link from "next/link";
 
 export function PharmacyHeroSection() {
   return (
@@ -32,6 +34,11 @@ export function PharmacyHeroSection() {
                 placeholder="Search medicines by name..."
                 className="pl-10 h-12 rounded-full"
               />
+            </div>
+             <div className="pt-4">
+                <Button asChild variant="outline">
+                    <Link href="/pharmacy/orders">Track Your Orders</Link>
+                </Button>
             </div>
           </motion.div>
           <motion.div
