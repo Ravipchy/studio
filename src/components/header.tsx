@@ -13,14 +13,20 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ThemeToggle } from "./theme-toggle";
 
 const services = [
-  "Find Nearby Doctor", "Book Ambulance", "View Medical Report", "Telemedicine", 
-  "Pharmacy", "Home Care", "Lab Tests", "Mental Health"
+  {label:"Find Nearby Doctor", href:"/doctors"},
+  {label:"Book Ambulance", href:"/ambulance"}, 
+  {label:"Telemedicine", href:"/telemedicine"},
+  {label:"View Medical Report", href:"#"}, 
+  {label:"Pharmacy", href:"#"}, 
+  {label:"Home Care", href:"#"}, 
+  {label:"Lab Tests", href:"#"}, 
+  {label:"Mental Health", href:"#"}
 ];
 
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
-  { href: "/doctors", label: "Services" },
+  { href: "#", label: "Services" },
   { href: "/health-record", label: "Health Record" },
   { href: "/contact", label: "Contact Us" },
 ];
@@ -57,7 +63,7 @@ export function Header() {
                 Service
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                {services.map(service => <DropdownMenuItem key={service} asChild><Link href="/doctors">{service}</Link></DropdownMenuItem>)}
+                {services.map(service => <DropdownMenuItem key={service.label} asChild><Link href={service.href}>{service.label}</Link></DropdownMenuItem>)}
               </DropdownMenuContent>
             </DropdownMenu>
             <Link href="/health-record" className="transition-colors hover:text-foreground/80 text-foreground/60">Health Record</Link>
@@ -86,12 +92,12 @@ export function Header() {
                     </div>
                   <nav className="flex flex-col gap-4 py-4">
                     {navLinks.map(link => (
-                      <Link key={link.label} href={link.href} className="text-lg font-medium">{link.label}</Link>
+                       <Link key={link.label} href={link.href} className="text-lg font-medium">{link.label}</Link>
                     ))}
                     <div className="space-y-2">
                       <p className="text-lg font-medium">Services</p>
                       <div className="flex flex-col gap-2 pl-4">
-                        {services.map(service => <Link href="/doctors" className="text-muted-foreground" key={service}>{service}</Link>)}
+                        {services.map(service => <Link href={service.href} className="text-muted-foreground" key={service.label}>{service.label}</Link>)}
                       </div>
                     </div>
                   </nav>
