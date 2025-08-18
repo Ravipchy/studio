@@ -1,0 +1,72 @@
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Users can read their own data, but not other users' data.
+    match /users/{userId} {
+      allow read, update: if request.auth.uid == userId;
+      allow create: if request.auth.uid != null;
+    }
+
+    // Doctors can read all doctor profiles, patients can read all doctor profiles.
+    match /doctors/{doctorId} {
+        allow read: if request.auth.uid != null;
+        // Only the doctor themselves can update their profile
+        allow update: if request.auth.uid == resource.data.userId;
+        // Allow creation for authenticated users who claim to be doctors
+        allow create: if request.auth.uid != null && request.resource.data.role == 'doctor';
+    }
+
+    // Patients can only manage their own profile.
+    match /patients/{patientId} {
+        allow read, update, create: if request.auth.uid == resource.data.userId;
+    }
+
+    // Appointments can be created by any authenticated user.
+    // Patients can only read their own appointments.
+    // Doctors can only read appointments where they are the doctor.
+    match /appointments/{appointmentId} {
+      allow create: if request.auth.uid != null;
+      allow read: if request.auth.uid == resource.data.patientId || request.auth.uid == resource.data.doctorId;
+      allow update: if request.auth.uid == resource.data.doctorId; // Doctor can update status
+    }
+    
+    // Users can only manage their own pharmacy orders.
+    match /pharmacyOrders/{orderId} {
+        allow read, create, update: if request.auth.uid == resource.data.patientId;
+    }
+
+    // Users can only manage their own lab tests.
+    match /labTests/{labTestId} {
+        allow read, create, update: if request.auth.uid == resource.data.patientId;
+    }
+
+    // Users can only manage their own home care bookings.
+    match /homeCareBookings/{bookingId} {
+        allow read, create, update: if request.auth.uid == resource.data.patientId;
+    }
+    
+    // Users can only manage their own ambulance bookings.
+    match /ambulanceBookings/{bookingId} {
+        allow read, create, update: if request.auth.uid == resource.data.patientId;
+    }
+
+    // Users can create reports.
+    // They can read reports they own.
+    // Doctors can read reports that are shared with them.
+    match /medicalReports/{reportId} {
+        allow create: if request.auth.uid != null;
+        allow read: if request.auth.uid == resource.data.patientId || request.auth.uid in resource.data.sharedWith;
+        // Only patient can grant/revoke access
+        allow update: if request.auth.uid == resource.data.patientId;
+    }
+    
+    // Users can only manage their own mental health sessions.
+    // Counsellors can read sessions they are part of.
+    match /mentalHealthSessions/{sessionId} {
+        allow create: if request.auth.uid != null;
+        allow read, update: if request.auth.uid == resource.data.patientId || request.auth.uid == resource.data.counsellorId;
+    }
+  }
+}

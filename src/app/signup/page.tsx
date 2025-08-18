@@ -11,14 +11,21 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { User, Mail, Phone, KeyRound, Stethoscope, UserCircle } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { auth, db } from "@/lib/firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { setDoc, doc } from "firebase/firestore";
 
 export default function SignupPage() {
   const router = useRouter();
   const { toast } = useToast();
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [role, setRole] = useState<"patient" | "doctor">("patient");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirmPassword) {
       toast({
@@ -28,13 +35,45 @@ export default function SignupPage() {
       });
       return;
     }
-    // In a real app, you'd call your Firebase signup function here.
-    toast({
-      title: "Signup Successful",
-      description: "Your account has been created. Redirecting...",
-    });
-    // Simulate a successful signup and redirect
-    setTimeout(() => router.push("/"), 500);
+    if (password.length < 6) {
+       toast({
+        variant: "destructive",
+        title: "Password is too weak",
+        description: "Password should be at least 6 characters long.",
+      });
+      return;
+    }
+
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        await setDoc(doc(db, "users", user.uid), {
+            name: fullName,
+            email: user.email,
+            phone: phone,
+            role: role,
+            createdAt: new Date().toISOString(),
+            authProvider: 'email'
+        });
+        
+        toast({
+            title: "Signup Successful",
+            description: "Your account has been created. Redirecting...",
+        });
+        
+        if (role === 'doctor') {
+            router.push("/doctor-dashboard");
+        } else {
+            router.push("/");
+        }
+    } catch (error: any) {
+        toast({
+            variant: "destructive",
+            title: "Signup Failed",
+            description: error.message,
+        });
+    }
   };
 
 
@@ -49,7 +88,7 @@ export default function SignupPage() {
           <form onSubmit={handleSignup} className="space-y-4">
             <div className="space-y-2">
                 <Label>I am a</Label>
-                <RadioGroup defaultValue="patient" className="grid grid-cols-2 gap-4">
+                <RadioGroup defaultValue="patient" onValueChange={(value: "patient" | "doctor") => setRole(value)} className="grid grid-cols-2 gap-4">
                     <div>
                         <RadioGroupItem value="patient" id="patient" className="peer sr-only" />
                         <Label
@@ -77,35 +116,35 @@ export default function SignupPage() {
               <Label htmlFor="fullname">Full Name</Label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input id="fullname" placeholder="John Doe" className="pl-10" required />
+                <Input id="fullname" placeholder="John Doe" className="pl-10" required value={fullName} onChange={(e) => setFullName(e.target.value)}/>
               </div>
             </div>
              <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
                <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input id="email" type="email" placeholder="john.doe@example.com" className="pl-10" required />
+                <Input id="email" type="email" placeholder="john.doe@example.com" className="pl-10" required value={email} onChange={(e) => setEmail(e.target.value)}/>
               </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="phone">Phone Number</Label>
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input id="phone" type="tel" placeholder="+91 1234567890" className="pl-10" required />
+                <Input id="phone" type="tel" placeholder="+91 1234567890" className="pl-10" required value={phone} onChange={(e) => setPhone(e.target.value)}/>
               </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
                 <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input id="password" type="password" placeholder="••••••••" className="pl-10" required minLength={6} onChange={(e) => setPassword(e.target.value)} />
+                <Input id="password" type="password" placeholder="••••••••" className="pl-10" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
               </div>
             </div>
              <div className="space-y-2">
               <Label htmlFor="confirm-password">Confirm Password</Label>
               <div className="relative">
                 <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input id="confirm-password" type="password" placeholder="••••••••" className="pl-10" required onChange={(e) => setConfirmPassword(e.target.value)} />
+                <Input id="confirm-password" type="password" placeholder="••••••••" className="pl-10" required value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
               </div>
             </div>
             <Button type="submit" className="w-full">

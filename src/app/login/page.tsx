@@ -11,20 +11,83 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { KeyRound, Mail, Chrome } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { auth, db } from "@/lib/firebase";
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, you'd call your Firebase auth function here.
-    toast({
-      title: "Login Successful",
-      description: "Redirecting to your dashboard...",
-    });
-    // Simulate a successful login and redirect
-    setTimeout(() => router.push("/"), 500);
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      const userRole = userDoc.exists() ? userDoc.data().role : 'patient';
+
+      toast({
+        title: "Login Successful",
+        description: "Redirecting...",
+      });
+
+      if (userRole === 'doctor') {
+        router.push("/doctor-dashboard");
+      } else {
+        router.push("/");
+      }
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Login Failed",
+        description: error.message,
+      });
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDoc = await getDoc(userDocRef);
+
+        let userRole = 'patient'; // default role
+
+        if (!userDoc.exists()) {
+            // New user, prompt for role
+            // For simplicity, we'll default to patient. A real app would have a role selection modal.
+            await setDoc(userDocRef, {
+                name: user.displayName,
+                email: user.email,
+                role: 'patient',
+                authProvider: 'google',
+                createdAt: new Date().toISOString()
+            });
+             toast({ title: "Account Created", description: "You've been registered as a patient." });
+        } else {
+            userRole = userDoc.data().role;
+        }
+
+        toast({ title: "Logged in with Google", description: "Redirecting..." });
+        
+        if (userRole === 'doctor') {
+            router.push('/doctor-dashboard');
+        } else {
+            router.push('/');
+        }
+    } catch (error: any) {
+        toast({
+            variant: "destructive",
+            title: "Google Login Failed",
+            description: error.message,
+        });
+    }
   };
 
   return (
@@ -40,14 +103,14 @@ export default function LoginPage() {
               <Label htmlFor="email">Email</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input id="email" type="email" placeholder="john.doe@example.com" className="pl-10" required />
+                <Input id="email" type="email" placeholder="john.doe@example.com" className="pl-10" required value={email} onChange={(e) => setEmail(e.target.value)} />
               </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
                 <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input id="password" type="password" placeholder="••••••••" className="pl-10" required />
+                <Input id="password" type="password" placeholder="••••••••" className="pl-10" required value={password} onChange={(e) => setPassword(e.target.value)} />
               </div>
             </div>
             <Button type="submit" className="w-full">
@@ -60,7 +123,7 @@ export default function LoginPage() {
             <span className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 bg-background px-2 text-sm text-muted-foreground">OR</span>
           </div>
 
-          <Button variant="outline" className="w-full">
+          <Button variant="outline" className="w-full" onClick={handleGoogleLogin}>
             <Chrome className="mr-2 h-5 w-5" />
             Sign in with Google
           </Button>

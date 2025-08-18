@@ -13,6 +13,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ThemeToggle } from "./theme-toggle";
+import { useAuth } from "@/context/AuthContext";
+import { auth } from "@/lib/firebase";
+import { signOut } from "firebase/auth";
+import { useRouter } from "next/navigation";
 
 const patientServices = [
   {label:"Find Nearby Doctor", href:"/doctors"},
@@ -31,7 +35,6 @@ const doctorNavLinks = [
     { href: "/doctor-appointments", label: "Appointments" },
     { href: "/telemedicine", label: "Telemedicine" },
     { href: "/health-record", label: "Reports" },
-    { href: "#", label: "Profile" },
 ];
 
 const patientNavLinks = [
@@ -55,63 +58,47 @@ function RedCrossIcon() {
 }
 
 function AuthNav() {
-    const [user, setUser] = useState<{role: "patient" | "doctor" | null}>({role: null});
-    const [isMounted, setIsMounted] = useState(false);
+  const { user, userRole } = useAuth();
+  const router = useRouter();
 
-    useEffect(() => {
-        setIsMounted(true);
-        const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
-        if (currentPath.includes('doctor-')) {
-            setUser({ role: 'doctor' });
-        } else {
-            setUser({ role: 'patient' });
-        }
-    }, []);
+  const handleLogout = async () => {
+      await signOut(auth);
+      router.push('/login');
+  };
 
-    if (!isMounted) {
-        return null;
-    }
-
-    if (!user.role) {
-      return (
-        <>
-            <Button variant="ghost" asChild><Link href="/login">Log in</Link></Button>
-            <Button asChild><Link href="/signup">Sign up</Link></Button>
-        </>
-      )
-    }
-    
+  if (!user) {
     return (
-      <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-              <Button variant="secondary">
-                  <User className="mr-2"/>
-                  {user.role === 'doctor' ? 'Dr. Smith' : 'John Doe'}
-              </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => setUser({role: null})}>
-                  <LogOut className="mr-2"/> Logout
-              </DropdownMenuItem>
-          </DropdownMenuContent>
-      </DropdownMenu>
+      <>
+          <Button variant="ghost" asChild><Link href="/login">Log in</Link></Button>
+          <Button asChild><Link href="/signup">Sign up</Link></Button>
+      </>
     )
+  }
+  
+  return (
+    <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+            <Button variant="secondary">
+                <User className="mr-2"/>
+                {user.displayName || "User"}
+            </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+              <DropdownMenuItem onClick={() => router.push(userRole === 'doctor' ? '/doctor-dashboard' : '/patient-dashboard')}>
+                Dashboard
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout}>
+                <LogOut className="mr-2"/> Logout
+            </DropdownMenuItem>
+        </DropdownMenuContent>
+    </DropdownMenu>
+  )
 }
 
 function HeaderContent() {
-    const [userRole, setUserRole] = useState<"patient" | "doctor" | null>(null);
-
-    useEffect(() => {
-        const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
-        if (currentPath.includes('doctor-')) {
-            setUserRole('doctor');
-        } else {
-            setUserRole('patient');
-        }
-    }, []);
+    const { userRole } = useAuth();
 
     const currentNavLinks = userRole === 'doctor' ? doctorNavLinks : patientNavLinks;
-    const currentServices = userRole === 'doctor' ? [] : patientServices;
 
     return (
         <div className="flex w-full items-center justify-end md:justify-between">
@@ -123,7 +110,7 @@ function HeaderContent() {
                     {link.label}
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                    {currentServices.map(service => (
+                    {patientServices.map(service => (
                         <React.Fragment key={service.label}>
                         <DropdownMenuItem asChild><Link href={service.href}>{service.label}</Link></DropdownMenuItem>
                         {service.subItems && (
@@ -146,58 +133,59 @@ function HeaderContent() {
             </nav>
             <div className="flex items-center gap-2">
                 <div className="hidden md:flex items-center gap-2">
-                <AuthNav />
-            </div>
-            <ThemeToggle />
-            <Sheet>
-                <SheetTrigger asChild>
-                <Button variant="outline" size="icon" className="md:hidden">
-                    <Menu className="h-5 w-5" />
-                    <span className="sr-only">Toggle Menu</span>
-                </Button>
-                </SheetTrigger>
-                <SheetContent side="left" className="w-full max-w-sm">
-                <div className="flex flex-col h-full">
-                    <div className="border-b pb-4">
-                        <Link href="/" className="flex items-center space-x-2">
-                            <RedCrossIcon />
-                            <span className="font-bold font-headline">AROGYA SATHI</span>
-                        </Link>
-                    </div>
-                    <nav className="flex flex-col gap-4 py-4">
-                        {currentNavLinks.filter(l => !l.isDropdown).map(link => (
-                        <Link key={link.label} href={link.href} className="text-lg font-medium">{link.label}</Link>
-                        ))}
-                        {userRole !== 'doctor' && (
-                            <div className="space-y-2 pt-2 border-t">
-                                <p className="text-lg font-medium text-muted-foreground">Services</p>
-                                <div className="flex flex-col gap-2 pl-4">
-                                    {currentServices.map(service => (
-                                    <div key={service.label}>
-                                        <Link href={service.href} className="text-muted-foreground font-semibold">{service.label}</Link>
-                                        {service.subItems && (
-                                        <div className="flex flex-col gap-1 pl-4 pt-1">
-                                            {service.subItems.map(subItem => (
-                                            <Link href={subItem.href} className="text-muted-foreground" key={subItem.label}>{subItem.label}</Link>
-                                            ))}
-                                        </div>
-                                        )}
-                                    </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                    </nav>
-                    <div className="mt-auto flex flex-col gap-2">
-                        <AuthNav />
-                    </div>
+                   <AuthNav />
                 </div>
-                </SheetContent>
-            </Sheet>
+                <ThemeToggle />
+                <Sheet>
+                    <SheetTrigger asChild>
+                    <Button variant="outline" size="icon" className="md:hidden">
+                        <Menu className="h-5 w-5" />
+                        <span className="sr-only">Toggle Menu</span>
+                    </Button>
+                    </SheetTrigger>
+                    <SheetContent side="left" className="w-full max-w-sm">
+                    <div className="flex flex-col h-full">
+                        <div className="border-b pb-4">
+                            <Link href="/" className="flex items-center space-x-2">
+                                <RedCrossIcon />
+                                <span className="font-bold font-headline">AROGYA SATHI</span>
+                            </Link>
+                        </div>
+                        <nav className="flex flex-col gap-4 py-4">
+                            {currentNavLinks.filter(l => !l.isDropdown).map(link => (
+                            <Link key={link.label} href={link.href} className="text-lg font-medium">{link.label}</Link>
+                            ))}
+                            {userRole !== 'doctor' && (
+                                <div className="space-y-2 pt-2 border-t">
+                                    <p className="text-lg font-medium text-muted-foreground">Services</p>
+                                    <div className="flex flex-col gap-2 pl-4">
+                                        {patientServices.map(service => (
+                                        <div key={service.label}>
+                                            <Link href={service.href} className="text-muted-foreground font-semibold">{service.label}</Link>
+                                            {service.subItems && (
+                                            <div className="flex flex-col gap-1 pl-4 pt-1">
+                                                {service.subItems.map(subItem => (
+                                                <Link href={subItem.href} className="text-muted-foreground" key={subItem.label}>{subItem.label}</Link>
+                                                ))}
+                                            </div>
+                                            )}
+                                        </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </nav>
+                        <div className="mt-auto flex flex-col gap-2">
+                           <AuthNav />
+                        </div>
+                    </div>
+                    </SheetContent>
+                </Sheet>
             </div>
         </div>
     );
 }
+
 
 export function Header() {
   const [isMounted, setIsMounted] = useState(false);
