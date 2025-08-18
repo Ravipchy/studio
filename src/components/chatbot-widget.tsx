@@ -9,6 +9,7 @@ import { Input } from './ui/input';
 import { ScrollArea } from './ui/scroll-area';
 import { MessageCircle, Send, X, Bot } from 'lucide-react';
 import { chat, type ChatMessage } from '@/ai/flows/chat-flow';
+import { useAuth } from '@/contexts/auth-context';
 
 export function ChatbotWidget() {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,6 +19,7 @@ export function ChatbotWidget() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const { user, userData } = useAuth();
 
   const toggleOpen = () => setIsOpen(prev => !prev);
 
@@ -48,7 +50,7 @@ export function ChatbotWidget() {
 
     try {
         const history = newMessages.slice(0, -1);
-        const response = await chat(userMessage.content, history, 'guest');
+        const response = await chat(userMessage.content, history, userData?.role);
         setMessages(prev => [...prev, { role: 'model', content: response }]);
     } catch (error) {
         console.error("Chatbot error:", error);
@@ -58,6 +60,10 @@ export function ChatbotWidget() {
         scrollToBottom();
     }
   };
+  
+  if (!user) {
+    return null;
+  }
 
   return (
     <>
