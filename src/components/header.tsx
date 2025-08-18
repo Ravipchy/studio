@@ -61,7 +61,6 @@ function RedCrossIcon() {
 export function Header() {
     // This is a mock state. In a real app, you would get this from your Auth context.
     const [user, setUser] = React.useState<{role: "patient" | "doctor" | null}>({role: null});
-    const [role, setRole] = React.useState<"patient" | "doctor" | "guest">("guest");
 
 
     const handleLogin = (selectedRole: "patient" | "doctor") => {
@@ -136,23 +135,6 @@ export function Header() {
                     </DropdownMenuContent>
                 </DropdownMenu>
               )}
-                <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button variant="outline">Dashboards</Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                    <DropdownMenuLabel>View as</DropdownMenuLabel>
-                    <DropdownMenuSeparator/>
-                    <DropdownMenuRadioGroup value={user.role ?? "guest"} onValueChange={(value) => handleLogin(value as "patient" | "doctor")}>
-                        <DropdownMenuRadioItem value="patient">Patient</DropdownMenuRadioItem>
-                        <DropdownMenuRadioItem value="doctor">Doctor</DropdownMenuRadioItem>
-                        {user.role && <DropdownMenuRadioItem value="guest" onClick={handleLogout}>Guest</DropdownMenuRadioItem>}
-                    </DropdownMenuRadioGroup>
-                    <DropdownMenuSeparator/>
-                    <DropdownMenuItem asChild><Link href="/patient-dashboard">Patient Dashboard</Link></DropdownMenuItem>
-                    <DropdownMenuItem asChild><Link href="/doctor-dashboard">Doctor Dashboard</Link></DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
             </div>
             <ThemeToggle />
             <Sheet>
@@ -203,15 +185,6 @@ export function Header() {
                     ) : (
                         <Button size="lg" onClick={handleLogout}><LogOut className="mr-2"/> Logout</Button>
                     )}
-                     <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button size="lg" variant="outline">Dashboards</Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                            <DropdownMenuItem asChild><Link href="/patient-dashboard">Patient Dashboard</Link></DropdownMenuItem>
-                            <DropdownMenuItem asChild><Link href="/doctor-dashboard">Doctor Dashboard</Link></DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
                   </div>
                 </div>
               </SheetContent>
