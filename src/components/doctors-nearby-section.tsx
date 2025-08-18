@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -17,81 +17,45 @@ import { Star, MapPin, Stethoscope, Search, Calendar, Video } from "lucide-react
 import Image from "next/image";
 import { DoctorProfileModal } from "./doctor-profile-modal";
 import { Badge } from "@/components/ui/badge";
+import { db } from "@/lib/firebase";
+import { collection, getDocs, GeoPoint } from "firebase/firestore";
+import { Skeleton } from "./ui/skeleton";
 
-const doctors = [
-  {
-    id: 1,
-    name: "Dr. John Doe",
-    specialty: "Cardiologist",
-    qualification: "MD, FACC",
-    experience: "15+ years",
-    rating: 5,
-    reviews: 150,
-    avatar: "https://placehold.co/100x100.png",
-    distance: "1.2 km away",
-  },
-  {
-    id: 2,
-    name: "Dr. Jane Smith",
-    specialty: "Dermatologist",
-    qualification: "MBBS, DDVL",
-    experience: "8+ years",
-    rating: 4,
-    reviews: 98,
-    avatar: "https://placehold.co/100x100.png",
-    distance: "2.5 km away",
-  },
-  {
-    id: 3,
-    name: "Dr. Peter Jones",
-    specialty: "Orthopedist",
-    qualification: "MS (Ortho)",
-    experience: "12+ years",
-    rating: 5,
-    reviews: 210,
-    avatar: "https://placehold.co/100x100.png",
-    distance: "3.1 km away",
-  },
-  {
-    id: 4,
-    name: "Dr. Emily Carter",
-    specialty: "Neurologist",
-    qualification: "DM (Neurology)",
-    experience: "10+ years",
-    rating: 5,
-    reviews: 180,
-    avatar: "https://placehold.co/100x100.png",
-    distance: "4.0 km away",
-  },
-  {
-    id: 5,
-    name: "Dr. Alex Chen",
-    specialty: "Pediatrician",
-    qualification: "MD (Pediatrics)",
-    experience: "7+ years",
-    rating: 4,
-    reviews: 120,
-    avatar: "https://placehold.co/100x100.png",
-    distance: "5.2 km away",
-  },
-  {
-    id: 6,
-    name: "Dr. Sarah Lee",
-    specialty: "Dentist",
-    qualification: "BDS, MDS",
-    experience: "9+ years",
-    rating: 5,
-    reviews: 250,
-    avatar: "https://placehold.co/100x100.png",
-    distance: "1.8 km away",
-  },
-];
 
-export type Doctor = typeof doctors[0];
+export type Doctor = {
+    id: string;
+    name: string;
+    specialty: string;
+    qualification: string;
+    experience: string;
+    rating: number;
+    reviews: number;
+    avatar: string;
+    distance: string;
+    location?: GeoPoint;
+};
 
 
 export function DoctorsNearbySection() {
     const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
+    const [doctors, setDoctors] = useState<Doctor[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchDoctors = async () => {
+            setIsLoading(true);
+            try {
+                const querySnapshot = await getDocs(collection(db, "doctors"));
+                const doctorsList: Doctor[] = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Doctor));
+                setDoctors(doctorsList);
+            } catch (error) {
+                console.error("Error fetching doctors:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchDoctors();
+    }, []);
 
     const handleViewProfile = (doctor: Doctor) => {
         setSelectedDoctor(doctor);
@@ -119,12 +83,12 @@ export function DoctorsNearbySection() {
                 </CardHeader>
                 <CardContent>
                     <div className="relative h-[500px] bg-gray-200 rounded-md overflow-hidden">
-                       <iframe 
-                           src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3807.190475350566!2d78.4746645148766!3d17.4029235880709!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bcb975b5b0b0b0b%3A0x1b0b0b0b0b0b0b0b!2sHyderabad%2C%20Telangana!5e0!3m2!1sen!2sin!4v1620020000000!5m2!1sen!2sin" 
-                           width="100%" 
-                           height="100%" 
-                           style={{border:0}} 
-                           allowFullScreen={false} 
+                       <iframe
+                           src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3807.190475350566!2d78.4746645148766!3d17.4029235880709!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bcb975b5b0b0b0b%3A0x1b0b0b0b0b0b0b0b!2sHyderabad%2C%20Telangana!5e0!3m2!1sen!2sin!4v1620020000000!5m2!1sen!2sin"
+                           width="100%"
+                           height="100%"
+                           style={{border:0}}
+                           allowFullScreen={false}
                            loading="lazy"
                            title="Google map of Hyderabad"
                            ></iframe>
@@ -192,8 +156,25 @@ export function DoctorsNearbySection() {
             </Card>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    {doctors.map((doctor, index) => (
-                        <motion.div 
+                    {isLoading ? (
+                        Array.from({ length: 6 }).map((_, index) => (
+                           <Card key={index} className="h-full flex flex-col">
+                                <CardContent className="p-4 flex flex-col items-center text-center">
+                                    <Skeleton className="w-24 h-24 rounded-full mb-4" />
+                                    <Skeleton className="h-6 w-3/4 mb-2" />
+                                    <Skeleton className="h-4 w-1/2 mb-1" />
+                                    <Skeleton className="h-4 w-1/3 mb-3" />
+                                    <Skeleton className="h-4 w-2/3 mb-4" />
+                                    <Skeleton className="h-5 w-1/2 mb-4" />
+                                    <div className="w-full flex flex-col gap-2 mt-auto">
+                                        <Skeleton className="h-9 w-full" />
+                                        <Skeleton className="h-9 w-full" />
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        ))
+                    ) : doctors.map((doctor, index) => (
+                        <motion.div
                             key={doctor.id}
                             initial={{ opacity: 0, y:20 }}
                             animate={{ opacity: 1, y:0 }}
@@ -231,7 +212,7 @@ export function DoctorsNearbySection() {
       </div>
     </motion.section>
     {selectedDoctor && (
-        <DoctorProfileModal 
+        <DoctorProfileModal
             doctor={selectedDoctor}
             isOpen={!!selectedDoctor}
             onClose={handleCloseModal}

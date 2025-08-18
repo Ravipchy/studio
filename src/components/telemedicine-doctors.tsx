@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,17 +11,34 @@ import { DoctorProfileModal } from "./doctor-profile-modal";
 import { type Doctor } from "./doctors-nearby-section";
 import { Input } from "./ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { db } from "@/lib/firebase";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { Skeleton } from "./ui/skeleton";
 
-
-const doctors: Doctor[] = [
-  { id: 1, name: "Dr. John Doe", specialty: "Cardiologist", qualification: "MD, FACC", experience: "15+ years", rating: 5, reviews: 150, avatar: "https://placehold.co/100x100.png", distance: "Online" },
-  { id: 2, name: "Dr. Jane Smith", specialty: "Dermatologist", qualification: "MBBS, DDVL", experience: "8+ years", rating: 4, reviews: 98, avatar: "https://placehold.co/100x100.png", distance: "Online" },
-  { id: 3, name: "Dr. Peter Jones", specialty: "Orthopedist", qualification: "MS (Ortho)", experience: "12+ years", rating: 5, reviews: 210, avatar: "https://placehold.co/100x100.png", distance: "Online" },
-  { id: 4, name: "Dr. Emily Carter", specialty: "Neurologist", qualification: "DM (Neurology)", experience: "10+ years", rating: 5, reviews: 180, avatar: "https://placehold.co/100x100.png", distance: "Online" },
-];
 
 export function TelemedicineDoctors() {
     const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
+    const [doctors, setDoctors] = useState<Doctor[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchDoctors = async () => {
+            setIsLoading(true);
+            try {
+                const doctorsRef = collection(db, "doctors");
+                const q = query(doctorsRef, where("telemedicineEnabled", "==", true));
+                const querySnapshot = await getDocs(q);
+                const doctorsList: Doctor[] = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), distance: "Online" } as Doctor));
+                setDoctors(doctorsList);
+            } catch (error) {
+                console.error("Error fetching telemedicine doctors:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchDoctors();
+    }, []);
+
 
     const handleViewProfile = (doctor: Doctor) => {
         setSelectedDoctor(doctor);
@@ -68,8 +85,23 @@ export function TelemedicineDoctors() {
         </Card>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {doctors.map((doctor, index) => (
-                <motion.div 
+            {isLoading ? (
+                Array.from({ length: 4 }).map((_, index) => (
+                     <Card key={index} className="h-full flex flex-col">
+                        <CardContent className="p-4 flex flex-col items-center text-center">
+                            <Skeleton className="w-24 h-24 rounded-full mb-4" />
+                            <Skeleton className="h-6 w-3/4 mb-2" />
+                            <Skeleton className="h-4 w-1/2 mb-3" />
+                            <Skeleton className="h-4 w-2/3 mb-4" />
+                            <div className="w-full flex flex-col gap-2 mt-auto">
+                                <Skeleton className="h-9 w-full" />
+                                <Skeleton className="h-9 w-full" />
+                            </div>
+                        </CardContent>
+                    </Card>
+                ))
+            ) : doctors.map((doctor, index) => (
+                <motion.div
                     key={doctor.id}
                     initial={{ opacity: 0, y:20 }}
                     animate={{ opacity: 1, y:0 }}
@@ -102,7 +134,7 @@ export function TelemedicineDoctors() {
       </div>
     </motion.section>
     {selectedDoctor && (
-        <DoctorProfileModal 
+        <DoctorProfileModal
             doctor={selectedDoctor}
             isOpen={!!selectedDoctor}
             onClose={handleCloseModal}
@@ -111,4 +143,3 @@ export function TelemedicineDoctors() {
     </>
   );
 }
-

@@ -4,7 +4,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup, type User } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
-import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
+import { doc, setDoc, getDoc, serverTimestamp, GeoPoint } from "firebase/firestore";
 import { type User as AppUser } from "@/models/user";
 import { initializeApp } from "firebase/app";
 
@@ -93,6 +93,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signup = async (email: string, pass: string, name: string, role: 'patient'|'doctor') => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
     const user = userCredential.user;
+    
     // Create a user document in Firestore
     await setDoc(doc(db, "users", user.uid), {
       uid: user.uid,
@@ -104,6 +105,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       createdAt: serverTimestamp(),
       authProvider: 'email/password'
     });
+    
+    // If the user is a doctor, create a public doctor profile
+    if (role === 'doctor') {
+        await setDoc(doc(db, "doctors", user.uid), {
+            name,
+            specialty: "General Physician", // Default value
+            qualification: "MBBS", // Default value
+            experience: "1 year", // Default value
+            rating: 4, // Default value
+            reviews: 0, // Default value
+            avatar: "https://placehold.co/100x100.png",
+            distance: "2 km away", // Default, should be calculated
+            location: new GeoPoint(17.402923, 78.474664), // Default to Hyderabad
+            telemedicineEnabled: true,
+            userId: user.uid
+        });
+    }
   };
 
   const logout = () => {
