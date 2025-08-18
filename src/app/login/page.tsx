@@ -9,7 +9,8 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { KeyRound, Mail } from "lucide-react";
+import { KeyRound, Mail, Chrome } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -53,6 +54,17 @@ export default function LoginPage() {
               Log In
             </Button>
           </form>
+
+          <div className="relative my-6">
+            <Separator />
+            <span className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 bg-background px-2 text-sm text-muted-foreground">OR</span>
+          </div>
+
+          <Button variant="outline" className="w-full">
+            <Chrome className="mr-2 h-5 w-5" />
+            Sign in with Google
+          </Button>
+
           <div className="mt-4 text-center text-sm">
             Don't have an account?{" "}
             <Link href="/signup" className="underline font-semibold">

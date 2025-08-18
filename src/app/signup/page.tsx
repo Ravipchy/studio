@@ -9,7 +9,8 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { User, Mail, Phone, KeyRound } from "lucide-react";
+import { User, Mail, Phone, KeyRound, Stethoscope, UserCircle } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -46,6 +47,32 @@ export default function SignupPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSignup} className="space-y-4">
+            <div className="space-y-2">
+                <Label>I am a</Label>
+                <RadioGroup defaultValue="patient" className="grid grid-cols-2 gap-4">
+                    <div>
+                        <RadioGroupItem value="patient" id="patient" className="peer sr-only" />
+                        <Label
+                        htmlFor="patient"
+                        className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                        >
+                        <UserCircle className="mb-3 h-6 w-6" />
+                        Patient
+                        </Label>
+                    </div>
+
+                    <div>
+                        <RadioGroupItem value="doctor" id="doctor" className="peer sr-only" />
+                        <Label
+                        htmlFor="doctor"
+                        className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                        >
+                        <Stethoscope className="mb-3 h-6 w-6" />
+                        Doctor
+                        </Label>
+                    </div>
+                </RadioGroup>
+            </div>
             <div className="space-y-2">
               <Label htmlFor="fullname">Full Name</Label>
               <div className="relative">
