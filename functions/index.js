@@ -19,12 +19,19 @@ function haversineDistance(lat1, lon1, lat2, lon2) {
 
 exports.getAllNearbySorted = functions.https.onRequest(async (req, res) => {
   try {
-    const { lat, lng, radius } = req.query;
+    const { lat, lng, radius, type } = req.query;
     const userLat = parseFloat(lat);
     const userLng = parseFloat(lng);
     const searchRadius = parseFloat(radius) || 10;
 
-    const collections = ["doctors", "pharmacies", "labs", "ambulances", "homecare"];
+    // Collections to query
+    let collections = ["doctors", "pharmacies", "labs", "ambulances", "homecare"];
+    
+    // If a valid type filter is applied, use only that collection
+    if (type && collections.includes(type)) {
+      collections = [type];
+    }
+
     let allResults = [];
 
     await Promise.all(
