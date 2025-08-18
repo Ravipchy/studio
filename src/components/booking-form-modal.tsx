@@ -11,6 +11,8 @@ import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Separator } from "./ui/separator";
 import { type Doctor } from "./doctors-nearby-section";
 import { BookingConfirmationModal } from "./booking-confirmation-modal";
+import { Video } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface BookingFormModalProps {
   isOpen: boolean;
@@ -18,20 +20,27 @@ interface BookingFormModalProps {
   doctor: Doctor;
   timeSlot: string;
   onBookingConfirmed: () => void;
+  isTelemedicine: boolean;
 }
 
-export function BookingFormModal({ isOpen, onClose, doctor, timeSlot, onBookingConfirmed }: BookingFormModalProps) {
+export function BookingFormModal({ isOpen, onClose, doctor, timeSlot, onBookingConfirmed, isTelemedicine }: BookingFormModalProps) {
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
+  const router = useRouter();
 
   const handleConfirmBooking = () => {
-    // Logic to submit form data would go here
     onClose(); // Close the current form
-    setIsConfirmationOpen(true);
+    if (isTelemedicine) {
+        // In a real app, you would save the booking and then navigate.
+        // For demo, we navigate directly to a mock session page.
+        router.push('/telemedicine/session');
+    } else {
+        setIsConfirmationOpen(true);
+    }
   };
 
   const handleCloseConfirmation = () => {
     setIsConfirmationOpen(false);
-    onBookingConfirmed(); // Also close the underlying profile modal
+    onBookingConfirmed();
   }
 
   return (
@@ -39,7 +48,7 @@ export function BookingFormModal({ isOpen, onClose, doctor, timeSlot, onBookingC
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Book Appointment</DialogTitle>
+          <DialogTitle>Book {isTelemedicine ? "Video Consultation" : "Appointment"}</DialogTitle>
           <DialogDescription>
             Confirm your details for an appointment with {doctor.name} at {timeSlot}.
           </DialogDescription>
@@ -69,28 +78,32 @@ export function BookingFormModal({ isOpen, onClose, doctor, timeSlot, onBookingC
               <RadioGroup defaultValue="clinic" className="flex gap-4">
                   <Label htmlFor="clinic" className="flex items-center gap-2 border rounded-md p-3 flex-1 cursor-pointer hover:bg-muted has-[input:checked]:bg-primary/10 has-[input:checked]:border-primary">
                       <RadioGroupItem value="clinic" id="clinic" />
-                      <span>Pay at Clinic</span>
+                      <span>{isTelemedicine ? 'Pay Before Call' : 'Pay at Clinic'}</span>
                   </Label>
                    <Label htmlFor="online" className="flex items-center gap-2 border rounded-md p-3 flex-1 cursor-pointer hover:bg-muted has-[input:checked]:bg-primary/10 has-[input:checked]:border-primary">
                       <RadioGroupItem value="online" id="online" />
-                      <span>Pay Online</span>
+                      <span>Pay Online Now</span>
                   </Label>
               </RadioGroup>
           </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button onClick={handleConfirmBooking}>Confirm & Book (₹800)</Button>
+          <Button onClick={handleConfirmBooking}>
+            {isTelemedicine && <Video className="mr-2 h-4 w-4"/>}
+            Confirm & {isTelemedicine ? 'Proceed to Pay' : 'Book'} (₹800)
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
 
-    <BookingConfirmationModal
+    {!isTelemedicine && <BookingConfirmationModal
         isOpen={isConfirmationOpen}
         onClose={handleCloseConfirmation}
         doctor={doctor}
         timeSlot={timeSlot}
-    />
+    />}
     </>
   );
 }
+

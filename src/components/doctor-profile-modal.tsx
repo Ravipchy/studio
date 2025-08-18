@@ -25,6 +25,8 @@ export function DoctorProfileModal({ isOpen, onClose, doctor }: DoctorProfileMod
 
   if (!doctor) return null;
 
+  const isTelemedicine = doctor.distance === "Online";
+
   const handleBookNow = (slot: string) => {
     setSelectedSlot(slot);
     setIsBookingFormOpen(true);
@@ -57,7 +59,7 @@ export function DoctorProfileModal({ isOpen, onClose, doctor }: DoctorProfileMod
                 </div>
                  <div className="flex gap-2 mt-2">
                     <Button variant="outline" size="sm"><Phone className="mr-2 h-4 w-4"/> Call Now</Button>
-                    <Button variant="outline" size="sm"><Video className="mr-2 h-4 w-4"/> Video Consult</Button>
+                    <Button variant="outline" size="sm" disabled={!isTelemedicine}><Video className="mr-2 h-4 w-4"/> Video Consult</Button>
                  </div>
             </div>
             <div className="p-6">
@@ -67,10 +69,10 @@ export function DoctorProfileModal({ isOpen, onClose, doctor }: DoctorProfileMod
                 </p>
                 <Separator />
                 <div className="flex items-center gap-2 my-4">
-                    <MapPin className="h-5 w-5 text-primary" />
+                    {isTelemedicine ? <Video className="h-5 w-5 text-primary" /> : <MapPin className="h-5 w-5 text-primary" />}
                     <div>
-                        <p className="font-semibold">Arogya Sathi Clinic</p>
-                        <p className="text-sm text-muted-foreground">123 Health St, Hyderabad. {doctor.distance}</p>
+                        <p className="font-semibold">{isTelemedicine ? "Online Consultation" : "Arogya Sathi Clinic"}</p>
+                        <p className="text-sm text-muted-foreground">{isTelemedicine ? "Available for video calls" : `123 Health St, Hyderabad. ${doctor.distance}`}</p>
                     </div>
                 </div>
                  <Separator />
@@ -104,6 +106,7 @@ export function DoctorProfileModal({ isOpen, onClose, doctor }: DoctorProfileMod
             doctor={doctor}
             timeSlot={selectedSlot}
             onBookingConfirmed={onClose} // Close profile modal on final confirmation
+            isTelemedicine={isTelemedicine}
         />
     )}
     </>
