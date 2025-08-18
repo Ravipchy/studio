@@ -22,6 +22,7 @@ export default function SignupPage() {
   const router = useRouter();
   const { signup, googleLogin, user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,7 +42,7 @@ export default function SignupPage() {
   };
   
   const handleGoogleLogin = async () => {
-    setIsLoading(true);
+    setIsGoogleLoading(true);
     try {
         await googleLogin();
         router.push('/');
@@ -52,7 +53,7 @@ export default function SignupPage() {
             description: error.message,
         });
     } finally {
-        setIsLoading(false);
+        setIsGoogleLoading(false);
     }
   }
 
@@ -81,7 +82,7 @@ export default function SignupPage() {
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                disabled={isLoading}
+                disabled={isLoading || isGoogleLoading}
               />
             </div>
             <div className="space-y-2">
@@ -93,7 +94,7 @@ export default function SignupPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                disabled={isLoading}
+                disabled={isLoading || isGoogleLoading}
               />
             </div>
             <div className="space-y-2">
@@ -104,7 +105,7 @@ export default function SignupPage() {
                 required 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                disabled={isLoading}
+                disabled={isLoading || isGoogleLoading}
               />
             </div>
             <div className="space-y-2">
@@ -113,7 +114,7 @@ export default function SignupPage() {
                 defaultValue="patient"
                 className="flex gap-4"
                 onValueChange={(value: "patient" | "doctor") => setRole(value)}
-                disabled={isLoading}
+                disabled={isLoading || isGoogleLoading}
               >
                 <Label
                   htmlFor="patient"
@@ -131,7 +132,7 @@ export default function SignupPage() {
                 </Label>
               </RadioGroup>
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button type="submit" className="w-full" disabled={isLoading || isGoogleLoading}>
               {isLoading ? 'Creating Account...' : 'Sign Up'}
             </Button>
           </form>
@@ -145,9 +146,9 @@ export default function SignupPage() {
                 </span>
               </div>
             </div>
-            <Button variant="outline" className="w-full" onClick={handleGoogleLogin} disabled={isLoading}>
+            <Button variant="outline" className="w-full" onClick={handleGoogleLogin} disabled={isLoading || isGoogleLoading}>
               <Chrome className="mr-2 h-4 w-4" />
-              Sign up with Google
+              {isGoogleLoading ? 'Signing up...' : 'Sign up with Google'}
             </Button>
         </CardContent>
         <CardFooter className="justify-center">

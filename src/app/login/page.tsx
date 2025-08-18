@@ -19,6 +19,7 @@ export default function LoginPage() {
   const router = useRouter();
   const { login, googleLogin, user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +39,7 @@ export default function LoginPage() {
   };
 
   const handleGoogleLogin = async () => {
-    setIsLoading(true);
+    setIsGoogleLoading(true);
     try {
         await googleLogin();
         router.push('/');
@@ -49,7 +50,7 @@ export default function LoginPage() {
             description: error.message,
         });
     } finally {
-        setIsLoading(false);
+        setIsGoogleLoading(false);
     }
   }
 
@@ -78,7 +79,7 @@ export default function LoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                disabled={isLoading}
+                disabled={isLoading || isGoogleLoading}
               />
             </div>
             <div className="space-y-2">
@@ -89,10 +90,10 @@ export default function LoginPage() {
                 required 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                disabled={isLoading}
+                disabled={isLoading || isGoogleLoading}
                />
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button type="submit" className="w-full" disabled={isLoading || isGoogleLoading}>
               {isLoading ? 'Logging in...' : 'Login'}
             </Button>
           </form>
@@ -106,9 +107,9 @@ export default function LoginPage() {
                 </span>
               </div>
             </div>
-            <Button variant="outline" className="w-full" onClick={handleGoogleLogin} disabled={isLoading}>
+            <Button variant="outline" className="w-full" onClick={handleGoogleLogin} disabled={isLoading || isGoogleLoading}>
               <Chrome className="mr-2 h-4 w-4" />
-              Sign in with Google
+              {isGoogleLoading ? 'Signing in...' : 'Sign in with Google'}
             </Button>
         </CardContent>
         <CardFooter className="justify-center">
