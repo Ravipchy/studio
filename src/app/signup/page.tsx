@@ -17,7 +17,7 @@ export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const [role, setRole] = useState<"patient" | "doctor">("patient");
+  const [role, setRole] = useState<"patient" | "doctor" | "driver">("patient");
   const { toast } = useToast();
   const router = useRouter();
   const { signup, googleLogin, user } = useAuth();
@@ -117,23 +117,30 @@ export default function SignupPage() {
               <Label>I am a...</Label>
               <RadioGroup
                 defaultValue="patient"
-                className="flex gap-4"
-                onValueChange={(value: "patient" | "doctor") => setRole(value)}
+                className="grid grid-cols-3 gap-2"
+                onValueChange={(value: "patient" | "doctor" | "driver") => setRole(value)}
                 disabled={isLoading || isGoogleLoading}
               >
                 <Label
                   htmlFor="patient"
-                  className="flex items-center gap-2 border rounded-md p-3 flex-1 cursor-pointer hover:bg-muted has-[input:checked]:bg-primary/10 has-[input:checked]:border-primary"
+                  className="flex items-center justify-center gap-2 border rounded-md p-3 cursor-pointer hover:bg-muted has-[input:checked]:bg-primary/10 has-[input:checked]:border-primary"
                 >
                   <RadioGroupItem value="patient" id="patient" />
                   Patient
                 </Label>
                 <Label
                   htmlFor="doctor"
-                  className="flex items-center gap-2 border rounded-md p-3 flex-1 cursor-pointer hover:bg-muted has-[input:checked]:bg-primary/10 has-[input:checked]:border-primary"
+                  className="flex items-center justify-center gap-2 border rounded-md p-3 cursor-pointer hover:bg-muted has-[input:checked]:bg-primary/10 has-[input:checked]:border-primary"
                 >
                   <RadioGroupItem value="doctor" id="doctor" />
                   Doctor
+                </Label>
+                <Label
+                  htmlFor="driver"
+                  className="flex items-center justify-center gap-2 border rounded-md p-3 cursor-pointer hover:bg-muted has-[input:checked]:bg-primary/10 has-[input:checked]:border-primary"
+                >
+                  <RadioGroupItem value="driver" id="driver" />
+                  Driver
                 </Label>
               </RadioGroup>
             </div>

@@ -12,7 +12,7 @@ interface AuthContextType {
   userData: AppUser | null;
   isLoading: boolean;
   login: (email: string, pass: string) => Promise<any>;
-  signup: (email: string, pass: string, name: string, role: 'patient'|'doctor') => Promise<any>;
+  signup: (email: string, pass: string, name: string, role: 'patient'|'doctor'|'driver') => Promise<any>;
   logout: () => Promise<any>;
   googleLogin: () => Promise<any>;
 }
@@ -80,7 +80,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }
 
-  const signup = async (email: string, pass: string, name: string, role: 'patient'|'doctor') => {
+  const signup = async (email: string, pass: string, name: string, role: 'patient'|'doctor'|'driver') => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
     const user = userCredential.user;
     
@@ -110,6 +110,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             location: new GeoPoint(17.402923, 78.474664), // Default to Hyderabad
             telemedicineEnabled: true,
             userId: user.uid
+        });
+    }
+    // If the user is a driver, create a public driver profile
+    if (role === 'driver') {
+        await setDoc(doc(db, "drivers", user.uid), {
+            name,
+            vehicleNo: "TS09AB1234", // Default value
+            phone: "", // Default value
+            location: new GeoPoint(17.402923, 78.474664), // Default to Hyderabad
+            userId: user.uid,
+            isAvailable: true,
         });
     }
   };

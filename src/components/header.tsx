@@ -50,6 +50,18 @@ function RedCrossIcon() {
   );
 }
 
+function getDashboardLink(role?: 'patient' | 'doctor' | 'driver') {
+    switch (role) {
+        case 'doctor':
+            return '/doctor-dashboard';
+        case 'driver':
+            return '/ambulance-driver';
+        case 'patient':
+        default:
+            return '/patient-dashboard';
+    }
+}
+
 function HeaderContent() {
     const { user, logout, userData } = useAuth();
 
@@ -98,7 +110,7 @@ function HeaderContent() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuItem asChild>
-                            <Link href={userData?.role === 'doctor' ? '/doctor-dashboard' : '/patient-dashboard'}>
+                            <Link href={getDashboardLink(userData?.role)}>
                                 <UserCircle className="mr-2 h-4 w-4" />
                                 My Dashboard
                             </Link>

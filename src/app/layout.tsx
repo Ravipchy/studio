@@ -22,6 +22,7 @@ const protectedRoutes = [
     '/pharmacy',
     '/pharmacy/orders',
     '/telemedicine/session',
+    '/ambulance-driver',
 ];
 
 export default function RootLayout({
