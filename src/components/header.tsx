@@ -16,6 +16,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ThemeToggle } from "./theme-toggle";
 import { useAuth } from "@/contexts/auth-context";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Logo } from "./logo";
 
 
 const patientServices = [
@@ -36,19 +37,6 @@ const navLinks = [
   { href: "#", label: "Services", isDropdown: true },
   { href: "/contact", label: "Contact Us" },
 ];
-
-function RedCrossIcon() {
-  return (
-    <svg
-      className="h-8 w-8 text-red-500"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path d="M13.5 3H10.5V10.5H3V13.5H10.5V21H13.5V13.5H21V10.5H13.5V3Z" />
-    </svg>
-  );
-}
 
 function getDashboardLink(role?: 'patient' | 'doctor' | 'driver') {
     switch (role) {
@@ -142,10 +130,7 @@ function HeaderContent() {
                     <SheetContent side="left" className="w-full max-w-sm">
                     <div className="flex flex-col h-full">
                         <div className="border-b pb-4">
-                            <Link href="/" className="flex items-center space-x-2">
-                                <RedCrossIcon />
-                                <span className="font-bold font-headline">AROGYA SATHI</span>
-                            </Link>
+                           <Logo />
                         </div>
                         <nav className="flex flex-col gap-4 py-4">
                             {navLinks.filter(l => !l.isDropdown).map(link => (
@@ -194,10 +179,7 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
         <div className="mr-4 md:mr-6 flex items-center">
-          <Link href="/" className="flex items-center space-x-2">
-            <RedCrossIcon />
-            <span className="font-bold font-headline inline-block text-lg">AROGYA SATHI</span>
-          </Link>
+         <Logo />
         </div>
         {isMounted ? <HeaderContent /> : null}
       </div>

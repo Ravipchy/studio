@@ -1,28 +1,13 @@
 
 import Link from "next/link";
-
-function RedCrossIcon() {
-  return (
-    <svg
-      className="h-10 w-10 text-red-500"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path d="M13.5 3H10.5V10.5H3V13.5H10.5V21H13.5V13.5H21V10.5H13.5V3Z" />
-    </svg>
-  );
-}
+import { Logo } from "./logo";
 
 export function Footer() {
   return (
     <footer className="bg-sky-800 text-white">
       <div className="container py-12 grid grid-cols-1 md:grid-cols-4 gap-8">
         <div className="space-y-4 md:col-span-1">
-          <Link href="/" className="flex items-center space-x-2">
-            <RedCrossIcon />
-            <span className="font-bold font-headline text-2xl">AROGYA SATHI</span>
-          </Link>
+          <Logo textClassName="text-2xl" />
           <p className="text-sm">
             Arogya Sathi is a smart healthcare platform designed to tackle long wait times, overcrowding, and limited emergency access.
           </p>
