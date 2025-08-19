@@ -13,6 +13,11 @@ import { type Doctor } from "./doctors-nearby-section";
 import { BookingConfirmationModal } from "./booking-confirmation-modal";
 import { Video } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/auth-context";
+import { db } from "@/lib/firebase";
+import { collection, addDoc, serverTimestamp, Timestamp } from "firebase/firestore";
+import { useToast } from "@/hooks/use-toast";
+
 
 interface BookingFormModalProps {
   isOpen: boolean;
@@ -26,15 +31,52 @@ interface BookingFormModalProps {
 export function BookingFormModal({ isOpen, onClose, doctor, timeSlot, onBookingConfirmed, isTelemedicine }: BookingFormModalProps) {
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
   const router = useRouter();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleConfirmBooking = () => {
-    onClose(); // Close the current form
-    if (isTelemedicine) {
-        // In a real app, you would save the booking and then navigate.
-        // For demo, we navigate directly to a mock session page.
-        router.push('/telemedicine/session');
-    } else {
-        setIsConfirmationOpen(true);
+  const handleConfirmBooking = async () => {
+    if (!user) {
+        toast({
+            variant: "destructive",
+            title: "Not Logged In",
+            description: "You must be logged in to book an appointment.",
+        });
+        return router.push('/login');
+    }
+    
+    setIsLoading(true);
+
+    try {
+        const appointmentData = {
+            doctorId: doctor.id,
+            patientId: user.uid,
+            doctorName: doctor.name,
+            patientName: user.displayName,
+            date: Timestamp.fromDate(new Date()), // Using today's date for now
+            time: timeSlot,
+            type: isTelemedicine ? "Telemedicine" : "Clinic",
+            status: "Upcoming",
+            createdAt: serverTimestamp(),
+        };
+
+        await addDoc(collection(db, "appointments"), appointmentData);
+
+        onClose();
+        if (isTelemedicine) {
+            router.push('/telemedicine/session');
+        } else {
+            setIsConfirmationOpen(true);
+        }
+    } catch (error) {
+        console.error("Error booking appointment:", error);
+        toast({
+            variant: "destructive",
+            title: "Booking Failed",
+            description: "Could not book appointment. Please try again.",
+        });
+    } finally {
+        setIsLoading(false);
     }
   };
 
@@ -56,7 +98,7 @@ export function BookingFormModal({ isOpen, onClose, doctor, timeSlot, onBookingC
         <div className="py-4 space-y-4">
           <div>
             <Label htmlFor="name">Patient Name</Label>
-            <Input id="name" placeholder="John Doe" />
+            <Input id="name" defaultValue={user?.displayName || ""} placeholder="John Doe" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -65,7 +107,7 @@ export function BookingFormModal({ isOpen, onClose, doctor, timeSlot, onBookingC
             </div>
             <div>
               <Label htmlFor="phone">Phone Number</Label>
-              <Input id="phone" placeholder="+91 1234567890" />
+              <Input id="phone" defaultValue={user?.phoneNumber || ""} placeholder="+91 1234567890" />
             </div>
           </div>
           <div>
@@ -88,10 +130,11 @@ export function BookingFormModal({ isOpen, onClose, doctor, timeSlot, onBookingC
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button onClick={handleConfirmBooking}>
-            {isTelemedicine && <Video className="mr-2 h-4 w-4"/>}
-            Confirm & {isTelemedicine ? 'Proceed to Pay' : 'Book'} (₹800)
+          <Button variant="outline" onClick={onClose} disabled={isLoading}>Cancel</Button>
+          <Button onClick={handleConfirmBooking} disabled={isLoading}>
+            {isLoading ? "Booking..." :
+                isTelemedicine ? <><Video className="mr-2 h-4 w-4"/>Confirm & Pay (₹800)</> : "Confirm Booking (₹800)"
+            }
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -106,4 +149,3 @@ export function BookingFormModal({ isOpen, onClose, doctor, timeSlot, onBookingC
     </>
   );
 }
-

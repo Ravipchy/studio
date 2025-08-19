@@ -7,7 +7,6 @@ import { Button } from "./ui/button";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
-import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Separator } from "./ui/separator";
 import { OrderConfirmationModal } from "./order-confirmation-modal";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
@@ -16,6 +15,11 @@ import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { format } from "date-fns";
+import { useAuth } from "@/contexts/auth-context";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
+import { db } from "@/lib/firebase";
+import { collection, addDoc, serverTimestamp, Timestamp } from "firebase/firestore";
 
 interface HomeCareBookingModalProps {
   isOpen: boolean;
@@ -26,14 +30,54 @@ interface HomeCareBookingModalProps {
 export function HomeCareBookingModal({ isOpen, onClose, serviceTitle }: HomeCareBookingModalProps) {
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
   const [date, setDate] = useState<Date>();
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const { user } = useAuth();
+  const router = useRouter();
+  const { toast } = useToast();
 
-  const handleConfirmBooking = () => {
-    onClose(); 
-    setIsConfirmationOpen(true);
+  const handleConfirmBooking = async () => {
+     if (!user) {
+        toast({
+            variant: "destructive",
+            title: "Not Logged In",
+            description: "You must be logged in to book a service.",
+        });
+        return router.push('/login');
+    }
+    if (!date) {
+        toast({ variant: "destructive", title: "Please select a date." });
+        return;
+    }
+
+    setIsLoading(true);
+    try {
+        await addDoc(collection(db, "homeCareBookings"), {
+            patientId: user.uid,
+            patientName: user.displayName,
+            serviceType: serviceTitle,
+            status: "Upcoming",
+            scheduledDate: Timestamp.fromDate(date),
+            createdAt: serverTimestamp(),
+        });
+
+        onClose(); 
+        setIsConfirmationOpen(true);
+    } catch (error) {
+        console.error("Error booking home care:", error);
+        toast({
+            variant: "destructive",
+            title: "Booking Failed",
+            description: "Could not book service. Please try again.",
+        });
+    } finally {
+        setIsLoading(false);
+    }
   };
 
   const handleCloseConfirmation = () => {
     setIsConfirmationOpen(false);
+    router.push('/home-care/history');
   }
 
   return (
@@ -49,7 +93,7 @@ export function HomeCareBookingModal({ isOpen, onClose, serviceTitle }: HomeCare
         <div className="py-4 space-y-4 max-h-[70vh] overflow-y-auto pr-4">
           <div>
             <Label htmlFor="name">Patient Name</Label>
-            <Input id="name" placeholder="John Doe" />
+            <Input id="name" defaultValue={user?.displayName || ""} placeholder="John Doe" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -58,7 +102,7 @@ export function HomeCareBookingModal({ isOpen, onClose, serviceTitle }: HomeCare
             </div>
             <div>
               <Label htmlFor="phone">Phone Number</Label>
-              <Input id="phone" placeholder="+91 1234567890" />
+              <Input id="phone" defaultValue={user?.phoneNumber || ""} placeholder="+91 1234567890" />
             </div>
           </div>
            <div>
@@ -121,9 +165,9 @@ export function HomeCareBookingModal({ isOpen, onClose, serviceTitle }: HomeCare
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button onClick={handleConfirmBooking}>
-            Confirm Booking
+          <Button variant="outline" onClick={onClose} disabled={isLoading}>Cancel</Button>
+          <Button onClick={handleConfirmBooking} disabled={isLoading}>
+            {isLoading ? "Booking..." : "Confirm Booking"}
           </Button>
         </DialogFooter>
       </DialogContent>

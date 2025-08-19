@@ -16,6 +16,11 @@ import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { format } from "date-fns";
+import { useAuth } from "@/contexts/auth-context";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
+import { db } from "@/lib/firebase";
+import { collection, addDoc, serverTimestamp, Timestamp } from "firebase/firestore";
 
 interface LabTestBookingModalProps {
   isOpen: boolean;
@@ -26,14 +31,55 @@ interface LabTestBookingModalProps {
 export function LabTestBookingModal({ isOpen, onClose, testTitle }: LabTestBookingModalProps) {
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
   const [date, setDate] = useState<Date>();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleConfirmBooking = () => {
-    onClose(); 
-    setIsConfirmationOpen(true);
+  const { user } = useAuth();
+  const router = useRouter();
+  const { toast } = useToast();
+
+  const handleConfirmBooking = async () => {
+    if (!user) {
+        toast({
+            variant: "destructive",
+            title: "Not Logged In",
+            description: "You must be logged in to book a test.",
+        });
+        return router.push('/login');
+    }
+    if (!date) {
+        toast({ variant: "destructive", title: "Please select a date." });
+        return;
+    }
+
+    setIsLoading(true);
+    try {
+        await addDoc(collection(db, "labBookings"), {
+            patientId: user.uid,
+            patientName: user.displayName,
+            testName: testTitle,
+            status: "Upcoming",
+            scheduledDate: Timestamp.fromDate(date),
+            createdAt: serverTimestamp(),
+        });
+        
+        onClose(); 
+        setIsConfirmationOpen(true);
+
+    } catch (error) {
+        console.error("Error booking lab test:", error);
+        toast({
+            variant: "destructive",
+            title: "Booking Failed",
+            description: "Could not book test. Please try again.",
+        });
+    } finally {
+        setIsLoading(false);
+    }
   };
 
   const handleCloseConfirmation = () => {
     setIsConfirmationOpen(false);
+    router.push('/lab-tests/history');
   }
 
   return (
@@ -49,7 +95,7 @@ export function LabTestBookingModal({ isOpen, onClose, testTitle }: LabTestBooki
         <div className="py-4 space-y-4 max-h-[70vh] overflow-y-auto pr-4">
           <div>
             <Label htmlFor="name">Patient Name</Label>
-            <Input id="name" placeholder="John Doe" />
+            <Input id="name" defaultValue={user?.displayName || ""} placeholder="John Doe" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -58,7 +104,7 @@ export function LabTestBookingModal({ isOpen, onClose, testTitle }: LabTestBooki
             </div>
             <div>
               <Label htmlFor="phone">Phone Number</Label>
-              <Input id="phone" placeholder="+91 1234567890" />
+              <Input id="phone" defaultValue={user?.phoneNumber || ""} placeholder="+91 1234567890" />
             </div>
           </div>
            <div>
@@ -117,9 +163,9 @@ export function LabTestBookingModal({ isOpen, onClose, testTitle }: LabTestBooki
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button onClick={handleConfirmBooking}>
-            Confirm Booking
+          <Button variant="outline" onClick={onClose} disabled={isLoading}>Cancel</Button>
+          <Button onClick={handleConfirmBooking} disabled={isLoading}>
+            {isLoading ? "Booking..." : "Confirm Booking"}
           </Button>
         </DialogFooter>
       </DialogContent>
