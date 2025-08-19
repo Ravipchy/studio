@@ -9,6 +9,8 @@ import { type User as AppUser } from "@/models/user";
 import { initializeApp } from "firebase/app";
 
 // Re-initializing here to ensure it's available.
+// In a real-world scenario, this should come from environment variables,
+// but for this context, we'll keep it here to avoid configuration issues.
 const firebaseConfig = {
   apiKey: "AIzaSyDCaNgCa9ViyRhAOx54YWrDcCrg2MXMiEE",
   authDomain: "arogya-sathi-web.firebaseapp.com",
@@ -17,7 +19,8 @@ const firebaseConfig = {
   messagingSenderId: "98089851553",
   appId: "1:98089851553:web:e960614b8b7159539beee0"
 };
-const app = initializeApp(firebaseConfig);
+initializeApp(firebaseConfig);
+
 
 interface AuthContextType {
   user: User | null;
@@ -52,6 +55,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (userDoc.exists()) {
           setUserData(userDoc.data() as AppUser);
         } else {
+           // This case can happen if a user is created in Firebase Auth but not in Firestore.
+           // For Google Sign-in, we handle this in the googleLogin function itself.
            setUserData(null);
         }
       } else {
@@ -81,7 +86,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         uid: user.uid,
         name: user.displayName,
         email: user.email,
-        phone: user.phoneNumber,
+        phone: user.phoneNumber || "", // Set phone to empty string if not available
         role: "patient", // Default role
         profileImage: user.photoURL,
         createdAt: serverTimestamp(),
